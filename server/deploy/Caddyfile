@@ -1,0 +1,7 @@
+# Caddy gets the HTTPS certificate automatically.
+check.mon-agence.tn {
+    request_body {
+        max_size 400MB
+    }
+    reverse_proxy 127.0.0.1:8000
+}

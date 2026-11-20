@@ -1,0 +1,10 @@
+.env
+__pycache__/
+*.pyc
+vault/
+.gradle/
+build/
+local.properties
+.idea/
+*.iml
+out/

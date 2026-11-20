@@ -1,0 +1,640 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Car Check Agence</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: une colonne « téléphone », un écran = une action, gros boutons colorés par action */
+:root{
+  --bg:#eef1f4; --app:#f8fafb; --card:#ffffff; --ink:#15202b; --mute:#5c6875; --line:#d8dee4;
+  --out:#2b8a3e; --out-soft:#e3f4e6; --in:#1c6fd1; --in-soft:#e2eefb; --plan:#c77700; --plan-soft:#fdf0d8;
+  --req:#7048c8; --req-soft:#efe9fb; --boss:#25303b; --boss-soft:#e6e9ed; --bad:#d6336c; --bad-soft:#fde4ec; --cars:#0f7c74; --cars-soft:#dff2ef; --team:#8d5b3a; --team-soft:#f5ebe3;
+  --font:"IBM Plex Sans","IBM Plex Sans Arabic",system-ui,sans-serif;
+  --font-ar:"IBM Plex Sans Arabic","IBM Plex Sans",Tahoma,system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0d1217; --app:#121921; --card:#19222c; --ink:#e8edf2; --mute:#98a4b0; --line:#2b3642;
+  --out:#51c26a; --out-soft:#173222; --in:#5aa2f0; --in-soft:#14263b; --plan:#f0a53a; --plan-soft:#33270f;
+  --req:#a68af0; --req-soft:#251d3d; --boss:#c5ced8; --boss-soft:#222c37; --bad:#f06595; --bad-soft:#3b1828; --cars:#3cc2b5; --cars-soft:#123331; --team:#d9a07a; --team-soft:#33241a; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0d1217; --app:#121921; --card:#19222c; --ink:#e8edf2; --mute:#98a4b0; --line:#2b3642;
+  --out:#51c26a; --out-soft:#173222; --in:#5aa2f0; --in-soft:#14263b; --plan:#f0a53a; --plan-soft:#33270f;
+  --req:#a68af0; --req-soft:#251d3d; --boss:#c5ced8; --boss-soft:#222c37; --bad:#f06595; --bad-soft:#3b1828; --cars:#3cc2b5; --cars-soft:#123331; --team:#d9a07a; --team-soft:#33241a; color-scheme:dark}
+*{box-sizing:border-box}
+html,body{min-height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:17px;line-height:1.45;
+  padding-left:max(0px,env(safe-area-inset-left,0px));padding-right:max(0px,env(safe-area-inset-right,0px))}
+[dir="rtl"] body,[dir="rtl"]{font-family:var(--font-ar)}
+.note{max-width:430px;margin:0 auto;padding:12px 16px 0;color:var(--mute);font-size:.85rem}
+.note b{color:var(--ink)}
+.app{max-width:430px;margin:12px auto 28px;background:var(--app);min-height:760px;border:1px solid var(--line);border-radius:26px;overflow:hidden;
+  display:flex;flex-direction:column;box-shadow:0 12px 40px rgba(20,30,40,.08)}
+@media (max-width:460px){.app{margin:0;border-radius:0;border-left:0;border-right:0;min-height:100vh}.note{padding-top:8px}}
+.top{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--line);background:var(--card)}
+.top .who{flex:1;min-width:0}.top .who b{display:block;font-size:1rem}.top .who span{font-size:.8rem;color:var(--mute)}
+.pill-btn{border:1px solid var(--line);background:var(--app);color:var(--ink);border-radius:99px;padding:8px 14px;font:inherit;font-size:.9rem;font-weight:600;cursor:pointer;min-height:40px}
+.iconbtn{width:44px;height:44px;border-radius:12px;border:1px solid var(--line);background:var(--app);color:var(--ink);display:grid;place-items:center;cursor:pointer;flex:none}
+[dir="rtl"] .iconbtn svg.flip{transform:scaleX(-1)}
+main{flex:1;padding:18px 16px 24px;display:flex;flex-direction:column;gap:14px}
+h1{font-size:1.55rem;line-height:1.2;margin:0;text-wrap:balance}
+h2{font-size:1.1rem;margin:4px 0 0}
+.sub{color:var(--mute);margin:0;font-size:.95rem}
+button{font-family:inherit}
+:focus-visible{outline:3px solid var(--plan);outline-offset:2px}
+/* accueil */
+.alerts{display:grid;gap:8px}
+.alert{display:flex;align-items:center;gap:12px;border-radius:14px;padding:12px 14px;background:var(--card);border:1px solid var(--line);font-weight:600;text-align:start;cursor:pointer;color:var(--ink);width:100%;font-size:1rem}
+.alert .dot{width:12px;height:12px;border-radius:50%;flex:none}
+.alert.bad{border-color:var(--bad);background:var(--bad-soft)}.alert.bad .dot{background:var(--bad)}
+.alert.req .dot{background:var(--req)}.alert.in .dot{background:var(--in)}
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.tile{position:relative;border:0;border-radius:20px;padding:18px 14px;min-height:150px;display:flex;flex-direction:column;justify-content:space-between;align-items:flex-start;
+  text-align:start;cursor:pointer;color:var(--ink);font-size:1.25rem;font-weight:700;line-height:1.2}
+.tile small{display:block;font-size:.82rem;font-weight:500;color:var(--mute);margin-top:4px}
+.tile .ic{width:58px;height:58px;border-radius:16px;display:grid;place-items:center;color:#fff}
+.tile.out{background:var(--out-soft)}.tile.out .ic{background:var(--out)}
+.tile.in{background:var(--in-soft)}.tile.in .ic{background:var(--in)}
+.tile.plan{background:var(--plan-soft)}.tile.plan .ic{background:var(--plan)}
+.tile.req{background:var(--req-soft)}.tile.req .ic{background:var(--req)}
+.tile.boss{grid-column:1/-1;min-height:auto;flex-direction:row;align-items:center;gap:14px;background:var(--boss-soft)}.tile.boss .ic{background:var(--boss);color:var(--app)}
+.tile.cars{background:var(--cars-soft)}.tile.cars .ic{background:var(--cars)}.tile.team{background:var(--team-soft)}.tile.team .ic{background:var(--team)}
+.tile.wide{grid-column:1/-1;min-height:auto;flex-direction:row;align-items:center;gap:14px}
+.alert.plan .dot{background:var(--plan)}
+.choice:disabled{opacity:.6;cursor:not-allowed}
+.cc-top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.tl{display:grid;grid-template-columns:minmax(0,1.6fr) repeat(7,minmax(0,1fr));gap:3px;align-items:stretch}
+.tl .h{font-size:.64rem;text-align:center;color:var(--mute);font-weight:600;line-height:1.15;padding-bottom:2px}.tl .h.today{color:var(--ink);font-weight:800}
+.tl .rl{border:0;background:none;text-align:start;padding:2px 0;color:var(--ink);font:inherit;font-size:.8rem;font-weight:700;cursor:pointer;min-width:0;overflow:hidden;line-height:1.15}
+.tl .rl small{display:block;font-weight:500;color:var(--mute);font-size:.66rem;white-space:nowrap}
+.cell{border-radius:6px;min-height:36px}.cell.free{background:var(--out-soft)}.cell.rented{background:var(--in)}.cell.booked{background:var(--plan)}.cell.late{background:var(--bad)}
+.legend{display:flex;flex-wrap:wrap;gap:12px;font-size:.85rem;font-weight:600}.legend span{display:flex;align-items:center;gap:6px}.legend i{width:16px;height:16px;border-radius:4px}
+.carcard{display:grid;gap:6px;width:100%;text-align:start;border:2px solid var(--line);background:var(--card);border-radius:16px;padding:14px;cursor:pointer;color:var(--ink);font-size:1rem}
+.carcard>span{color:var(--mute);font-size:.9rem}.carcard.lvl1{border-color:var(--plan)}.carcard.lvl2{border-color:var(--bad)}
+.issue{font-weight:700;font-size:.92rem}.issue.l1{color:var(--plan)}.issue.l2{color:var(--bad)}
+.okline{display:flex;gap:8px;align-items:center;color:var(--out)!important;font-weight:600}
+.car-row.l1{border-color:var(--plan);background:var(--plan-soft)}.car-row.l2{border-color:var(--bad);background:var(--bad-soft)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}.chip{border-radius:99px;padding:4px 10px;font-size:.82rem;font-weight:600;background:var(--team-soft);color:var(--ink)}
+.mini{border:1px solid var(--line);background:var(--app);color:var(--ink);border-radius:10px;padding:6px 12px;font:inherit;font-size:.88rem;font-weight:600;cursor:pointer;min-height:40px;white-space:nowrap}
+.seg-wrap,.filters{display:flex;flex-wrap:wrap;gap:8px}
+.toggle{border:2px solid var(--line);background:var(--card);border-radius:14px;min-height:50px;padding:0 16px;font:inherit;font-size:1rem;font-weight:600;color:var(--ink);cursor:pointer}
+.toggle.sel{border-color:var(--c,var(--team));background:color-mix(in srgb,var(--c,var(--team)) 14%,var(--card))}
+.filters .toggle{min-height:42px;padding:0 12px;font-size:.92rem}
+.logrow{display:grid;grid-template-columns:auto minmax(0,1fr);gap:2px 12px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 14px}
+.logrow .when{grid-row:span 2;font-size:.8rem;color:var(--mute);font-weight:600;width:82px}.logrow span:last-child{font-size:.9rem;color:var(--mute)}
+.badge{position:absolute;top:12px;inset-inline-end:12px;min-width:30px;height:30px;border-radius:99px;background:var(--bad);color:#fff;font-size:1rem;display:grid;place-items:center;padding:0 8px}
+/* assistant */
+.prog{display:flex;gap:5px}.prog i{flex:1;height:7px;border-radius:4px;background:var(--line)}.prog i.on{background:var(--c,var(--out))}
+.stepno{font-size:.85rem;color:var(--mute);font-weight:600}
+.choice{display:flex;align-items:center;gap:14px;width:100%;border:2px solid var(--line);background:var(--card);border-radius:16px;padding:14px;cursor:pointer;text-align:start;color:var(--ink);font-size:1.05rem}
+.choice b{display:block}.choice span{color:var(--mute);font-size:.88rem}
+.choice.sel{border-color:var(--c,var(--out));box-shadow:0 0 0 3px color-mix(in srgb,var(--c,var(--out)) 25%,transparent)}
+.choice .carico{width:48px;height:48px;border-radius:12px;background:var(--app);display:grid;place-items:center;flex:none;color:var(--mute)}
+.choice.late{border-color:var(--bad);background:var(--bad-soft)}
+.group{font-size:.82rem;font-weight:700;color:var(--mute);text-transform:uppercase;letter-spacing:.06em;margin-top:6px}
+[dir="rtl"] .group{letter-spacing:0}
+.field{display:grid;gap:6px}.field label{font-weight:600;font-size:.95rem}
+input[type=text],input[type=tel],input[type=date],input[type=number]{width:100%;font:inherit;font-size:1.1rem;padding:14px;border-radius:14px;border:2px solid var(--line);background:var(--card);color:var(--ink);min-height:56px}
+.seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:8px}
+.seg button{border:2px solid var(--line);background:var(--card);border-radius:14px;min-height:56px;font-size:1.05rem;font-weight:600;color:var(--ink);cursor:pointer}
+.seg button.sel{border-color:var(--c,var(--out));background:color-mix(in srgb,var(--c,var(--out)) 14%,var(--card))}
+.big{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;min-height:64px;border:0;border-radius:18px;font-size:1.2rem;font-weight:700;cursor:pointer;color:#fff;background:var(--c,var(--out))}
+.big:disabled{opacity:.4;cursor:not-allowed}
+.big.light{background:var(--card);color:var(--ink);border:2px solid var(--line)}
+.big.no{background:var(--bad)}
+.yesno{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.spacer{flex:1}
+.footer{position:sticky;bottom:0;padding-top:8px;background:linear-gradient(transparent,var(--app) 30%)}
+.okmsg{display:flex;gap:10px;align-items:center;font-weight:600;color:var(--out)}
+.badmsg{border-radius:14px;padding:12px 14px;background:var(--bad-soft);color:var(--bad);font-weight:600}
+.infobox{border-radius:14px;padding:12px 14px;background:var(--card);border:1px solid var(--line);display:grid;gap:4px}
+.photo{width:100%;aspect-ratio:16/10;border-radius:16px;overflow:hidden;background:#20262d;display:block}
+.photo svg{width:100%;height:100%;display:block}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:8px}.pair figure{margin:0;display:grid;gap:4px}.pair figcaption{font-size:.85rem;color:var(--mute);font-weight:600}
+.cam{display:grid;place-items:center;gap:10px;border:3px dashed var(--line);border-radius:20px;padding:28px 16px;background:var(--card);cursor:pointer;color:var(--ink);font-size:1.15rem;font-weight:700;width:100%}
+.cam .ic{width:70px;height:70px;border-radius:50%;background:var(--c,var(--out));color:#fff;display:grid;place-items:center}
+/* viseur : toujours sombre */
+.viewfinder{position:relative;border-radius:18px;overflow:hidden;background:linear-gradient(160deg,#2c333a,#121519);color:#fff;min-height:330px;display:grid;grid-template-rows:auto 1fr auto}
+.vf-top{background:rgba(0,0,0,.55);padding:12px 14px;display:grid;gap:2px}.vf-top b{font-size:1.25rem}
+.vf-arrow{display:grid;place-items:center;font-size:5.5rem;color:#f2b705;text-shadow:0 0 14px #000;line-height:1}
+.vf-bot{background:rgba(0,0,0,.55);padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.vf-time{font-size:1.6rem;font-variant-numeric:tabular-nums;font-weight:700}
+.vf-dots{display:flex;gap:5px}.vf-dots i{width:20px;height:5px;border-radius:3px;background:rgba(255,255,255,.3)}.vf-dots i.on{background:#f2b705}
+.vf-btn{border:0;border-radius:14px;padding:12px 16px;font-size:1rem;font-weight:700;background:#d6336c;color:#fff;cursor:pointer;min-height:52px}
+.vf-btn:disabled{opacity:.55}
+.reading{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.reading div{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;text-align:center}
+.reading b{display:block;font-size:1.6rem;font-variant-numeric:tabular-nums}.reading span{color:var(--mute);font-size:.9rem}
+.gauge{display:grid;grid-template-columns:repeat(8,1fr);gap:5px;direction:ltr;align-items:end}
+.gauge i{display:block;height:34px;border-radius:6px;background:var(--line)}
+.gauge i.on{background:var(--c,var(--out))}
+.gauge.tap button{height:58px;border-radius:10px;border:2px solid var(--line);background:var(--card);cursor:pointer;padding:0}
+.gauge.tap button.on{background:var(--c,var(--out));border-color:var(--c,var(--out))}
+.gauge-ends{display:flex;justify-content:space-between;direction:ltr;color:var(--mute);font-weight:700;font-size:.9rem}
+.dtype{align-self:flex-start;border-radius:99px;padding:4px 12px;background:var(--card);border:1px solid var(--line);font-weight:600;font-size:.9rem}
+.money-in{display:flex;align-items:center;gap:10px}.money-in input{font-size:2rem;font-weight:700;text-align:center}.money-in span{font-size:1.4rem;font-weight:700}
+.examples{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.examples figure{margin:0;text-align:center;font-size:.78rem;color:var(--mute)}.examples svg{width:100%;border-radius:8px;display:block}
+.stepper{display:grid;grid-template-columns:72px 1fr 72px;gap:10px;align-items:center}
+.stepper button{height:72px;border-radius:18px;border:2px solid var(--line);background:var(--card);font-size:2rem;font-weight:700;color:var(--ink);cursor:pointer}
+.stepper output{text-align:center;font-size:2.6rem;font-weight:700;font-variant-numeric:tabular-nums}
+.stepper output small{display:block;font-size:1rem;color:var(--mute);font-weight:600}
+.money{display:grid;gap:8px}
+.mrow{display:flex;justify-content:space-between;gap:12px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;font-size:1.05rem}
+.mrow b{font-variant-numeric:tabular-nums;white-space:nowrap}
+.mrow.total{border:3px solid var(--out);background:var(--out-soft);font-size:1.2rem}.mrow.total b{font-size:1.5rem}
+.mrow input{width:120px;min-height:48px;padding:8px 10px;text-align:center}
+.done{display:grid;place-items:center;text-align:center;gap:14px;padding:20px 0}
+.done .ic{width:110px;height:110px;border-radius:50%;background:var(--c,var(--out));color:#fff;display:grid;place-items:center}
+.done ul{list-style:none;padding:0;margin:0;display:grid;gap:8px;text-align:start}
+.done li{display:flex;gap:10px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 14px}
+/* planning */
+.car-row{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px 14px}
+.car-row .meta{flex:1;min-width:0}.car-row b{display:block}.car-row span{color:var(--mute);font-size:.9rem}
+.st{border-radius:99px;padding:6px 12px;font-weight:700;font-size:.85rem;white-space:nowrap}
+.st.free{background:var(--out-soft);color:var(--out)}.st.rented{background:var(--in-soft);color:var(--in)}
+.st.booked{background:var(--plan-soft);color:var(--plan)}.st.late{background:var(--bad);color:#fff}
+.req-card{background:var(--card);border:2px solid var(--line);border-radius:18px;padding:14px;display:grid;gap:10px}
+.req-card .t{font-size:1.1rem;font-weight:700}
+.docs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.doc{aspect-ratio:1.58;border-radius:10px;background:var(--app);border:1px solid var(--line);display:grid;place-items:center;font-size:.72rem;color:var(--mute);text-align:center;padding:4px}
+.kpis{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px}
+.kpi b{display:block;font-size:1.5rem;font-variant-numeric:tabular-nums}.kpi span{color:var(--mute);font-size:.88rem}
+.bar{height:10px;border-radius:5px;background:var(--line);overflow:hidden}.bar i{display:block;height:100%;background:var(--in)}
+.example{align-self:flex-start;font-size:.75rem;color:var(--mute);border:1px solid var(--line);border-radius:99px;padding:2px 10px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+[hidden]{display:none!important}
+</style>
+
+</head><body>
+<p class="note" id="note"></p>
+<div class="app" id="app" aria-live="polite"></div>
+
+<script>
+/* ---------- textes : français / arabe ---------- */
+const T={
+fr:{lang:"عربي",hello:"Bonjour",staff:"Employé",owner:"Patron",asOwner:"Voir comme patron",asStaff:"Voir comme employé",
+ note:"<b>Maquette</b> · données d’exemple. Testez en français et en arabe, et comme employé ou patron.",
+ late:n=>n>1?`${n} voitures en retard`:`${n} voiture en retard`,retToday:n=>n>1?`${n} retours prévus aujourd’hui`:`${n} retour prévu aujourd’hui`,reqs:n=>n>1?`${n} demandes à traiter`:`${n} demande à traiter`,
+ out:"Sortie",outS:"Donner une voiture",in:"Retour",inS:"Reprendre une voiture",plan:"Planning",planS:"Libres et louées",req:"Demandes",reqS:"Réservations, prolongations",
+ boss:"Espace patron",bossS:"Argent, voitures, équipe",next:"Suivant",back:"Précédent",home:"Accueil",step:(a,b)=>`Étape ${a} sur ${b}`,
+ qCarOut:"Quelle voiture sort ?",bookedToday:"Réservée aujourd’hui",free:"Libres",
+ qClient:"Qui loue la voiture ?",name:"Nom du client",phone:"WhatsApp du client",msgLang:"Langue des messages au client",fromBooking:"Rempli depuis la réservation ✓",
+ qLic:"Le permis du client",licUntil:"Permis valable jusqu’au",licPhoto:"Photo du permis",licDone:"Photo prise ✓",licChecked:"Déjà vérifié à la réservation ✓",licBad:"Permis expiré : pas de location",
+ qFilm:"Filmez le tour de la voiture",filmHint:"Tenez le téléphone couché. Suivez la flèche.",filmStart:"Commencer à filmer",filmStop:"Terminer",filmLeft:s=>`Encore ${s} s`,filmOk:"Vidéo prête ✓",filmAgain:"Refilmer",
+ sides:["AVANT","CÔTÉ DROIT","ARRIÈRE","CÔTÉ GAUCHE","INTÉRIEUR"],sideHints:["Pare-choc, capot, plaque","Portes et roues","Coffre et plaque","Portes et roues","Sièges et compteur"],
+ qDash:"Photo du compteur",dashHint:"Mettez le contact. Le total des km et l’essence doivent se voir.",dashOdo:"Vous voyez seulement TRIP ? Appuyez sur le bouton du compteur jusqu’au total (ODO).",dashKinds:["À aiguilles","Numérique","Écran"],takePhoto:"Prendre la photo",read:"Lu automatiquement",km:"Kilomètres (total)",fuel:"Essence",right:"C’est juste",fix:"Corriger",tapFuel:"Touchez le niveau d’essence",empty:"Vide",full:"Plein",kmLow:k=>`Plus petit que la dernière fois (${k} km). Vérifiez.`,
+ qDmg:"Ces dégâts sont-ils vrais ?",dmgOf:(a,b)=>`${a} sur ${b}`,isDmg:"Est-ce bien un dégât ?",yes:"Oui",no:"Non",noDmg:"Aucun dégât trouvé ✓",
+ qDays:"Combien de jours ?",days:"jours",backOn:"Retour le",price:"Prix",perDay:"Prix par jour",total:"Total",typeIt:"Tapez le montant",
+ qDep:"La caution",depAmount:"Montant de la caution",depHow:"Payée comment ?",cash:"Espèces",card:"Carte",cheque:"Chèque",
+ finishOut:"Valider la sortie",finishIn:"Valider le retour",
+ outDone:"La voiture est sortie ✓",outL:["Vidéo et photos enregistrées","Caution notée","Rappel WhatsApp 12 h avant le retour"],
+ qCarIn:"Quelle voiture revient ?",lateTag:"En retard",expected:"Prévue",
+ fuelMiss:x=>`Il manque ${x} d’essence`,fuelOk:"Le plein est fait ✓",
+ qNew:"Nouveau dégât ?",before:"À la sortie",after:"Au retour",
+ qMoney:"L’argent",depGot:"Caution reçue",fuelCost:"Essence manquante",dmgCost:"Dégâts",giveBack:"À rendre au client",stillDue:"Le client doit encore",
+ inDone:"La voiture est rentrée ✓",inL:["Facture créée","Rapport envoyé au client sur WhatsApp","Caution rendue"],
+ planT:"Planning",stFree:"Libre",stRented:d=>`Louée · retour ${d}`,stBooked:d=>`Réservée · ${d}`,stLate:h=>`En retard ${h} h`,search:"Chercher une voiture libre",from:"Du",to:"Au",nFree:n=>`${n} voitures libres`,
+ reqT:"Demandes",wantsBook:n=>`${n} veut réserver`,wantsMore:(n,d)=>`${n} veut ${d} jours de plus`,docsSent:"CIN et permis envoyés",seeDocs:"Voir les papiers",hideDocs:"Cacher les papiers",
+ accept:"Accepter",refuse:"Refuser",nothing:"Rien à traiter ✓",accepted:"Accepté ✓ · message envoyé au client",acceptedPrice:x=>`Accepté ✓ · prix envoyé au client : ${x}`,refused:"Refusé · message envoyé au client",bookedAfter:"Impossible : la voiture est réservée après",
+ bossT:"Espace patron",month:"Ce mois",ca:"Chiffre d’affaires",occ:"Voitures louées",repairs:"Réparations",dep:"Gardé sur cautions",maint:"Entretien à faire",team:"Équipe",perCar:"Par voiture",
+ maintL:["Dacia Logan · vignette expirée : ne peut pas sortir","Kia Picanto · visite technique dans 14 jours","Renault Clio · vidange dans 220 km"],
+ teamL:[["Ahmed K.","21 sorties ce mois"],["Mouna T.","17 sorties ce mois"],["Hedi S.","12 sorties ce mois"]],
+ days7:["dim","lun","mar","mer","jeu","ven","sam"],tomorrow:"demain",today:"aujourd’hui",yesterday:"hier",d3:["dim","lun","mar","mer","jeu","ven","sam"],
+ cars:"Voitures",carsS:"État, km, entretien",teamTile:"Équipe",teamS:"Qui fait quoi",maintAlert:n=>n>1?`${n} voitures à surveiller`:`${n} voiture à surveiller`,
+ legend:{free:"Libre",rented:"Louée",booked:"Réservée",late:"En retard"},week:"Les 7 prochains jours",fleet:n=>`La flotte · ${n} voitures`,addCar:"Ajouter une voiture",edit:"Modifier",
+ fModel:"Marque et modèle",fPlate:"Plaque",fKm:"Kilomètres",fDash:"Type de compteur",fOil:"Prochaine vidange à (km)",fIns:"Assurance jusqu’au",fVis:"Visite technique jusqu’au",fVig:"Vignette jusqu’au",save:"Enregistrer",
+ newCar:"Nouvelle voiture",editCar:"Modifier la voiture",remove:"Retirer de la flotte",removeQ:n=>`Retirer ${n} ?`,removeL:"Elle ne sera plus proposée à la sortie ni aux clients. Son historique est gardé.",yesRemove:"Oui, retirer",cancel:"Annuler",cantRemove:"Impossible : la voiture est louée. Attendez son retour.",
+ need:"Remplissez le modèle, la plaque et les kilomètres.",needName:"Écrivez le nom de l’employé.",
+ carsT:"Les voitures",sum:(n,f)=>`${n} voitures · ${f} libres`,allOk:"Tout est en ordre",oilName:"Vidange",
+ oilIn:k=>`Vidange dans ${k} km`,oilLate:k=>`Vidange dépassée de ${k} km`,oilDone:"Vidange faite",oilDoneOk:"Vidange notée ✓",
+ paperOk:d=>`jusqu’au ${d}`,paperSoon:n=>`expire dans ${n} jours`,paperBad:"EXPIRÉ",ins:"Assurance",vis:"Visite technique",vig:"Vignette",
+ maintH:"Entretien et papiers",histH:"Historique",noHist:"Rien pour le moment",kmNow:"Kilomètres",dashT:"Compteur",blocked:"Papier expiré : ne peut pas sortir",
+ teamT:"Équipe",whoWhat:"Qui s’occupe de quoi",journal:"Journal : qui a fait quoi",all:"Tous",addStaff:"Ajouter un employé",newStaff:"Nouvel employé",editStaff:"Modifier l’employé",
+ fName:"Nom",fTel:"WhatsApp",fJobs:"S’occupe de",lastAct:"Dernière action",removeStaff:"Retirer l’employé",ownerOnly:"Seul le patron peut ajouter, modifier ou retirer une voiture.",
+ jobs:{out:"Sorties",in:"Retours",book:"Réservations",maint:"Entretien",cash:"Caisse"},
+ logK:{out:"Sortie",in:"Retour",book:"Réservation acceptée",more:"Prolongation acceptée",oil:"Vidange faite",add:"Voiture ajoutée",edit:"Voiture modifiée",remove:"Voiture retirée",staff:"Employé ajouté"}},
+ar:{lang:"Français",hello:"مرحبًا",staff:"موظّف",owner:"صاحب الوكالة",asOwner:"عرض كصاحب الوكالة",asStaff:"عرض كموظّف",
+ note:"<b>نموذج للتجربة</b> · بيانات مثال. جرّب بالعربية والفرنسية، كموظّف أو كصاحب الوكالة.",
+ late:n=>`${n} سيارة متأخرة`,retToday:n=>`${n} سيارات ترجع اليوم`,reqs:n=>`${n} طلبات للمعالجة`,
+ out:"خروج",outS:"تسليم سيارة",in:"رجوع",inS:"استلام سيارة",plan:"الجدول",planS:"الشاغرة والمكتراة",req:"الطلبات",reqS:"حجوزات وتمديدات",
+ boss:"فضاء صاحب الوكالة",bossS:"المال، السيارات، الفريق",next:"التالي",back:"السابق",home:"الرئيسية",step:(a,b)=>`الخطوة ${a} من ${b}`,
+ qCarOut:"أيّ سيارة ستخرج؟",bookedToday:"محجوزة اليوم",free:"شاغرة",
+ qClient:"من يكتري السيارة؟",name:"اسم الحريف",phone:"واتساب الحريف",msgLang:"لغة الرسائل للحريف",fromBooking:"معبّأ من الحجز ✓",
+ qLic:"رخصة سياقة الحريف",licUntil:"الرخصة صالحة إلى غاية",licPhoto:"صورة الرخصة",licDone:"تمّ التقاط الصورة ✓",licChecked:"تمّ التثبّت منها عند الحجز ✓",licBad:"الرخصة منتهية: لا يمكن الكراء",
+ qFilm:"صوّر السيارة من كل الجهات",filmHint:"امسك الهاتف بالعرض واتبع السهم.",filmStart:"ابدأ التصوير",filmStop:"إنهاء",filmLeft:s=>`بقي ${s} ث`,filmOk:"الفيديو جاهز ✓",filmAgain:"إعادة التصوير",
+ sides:["الأمام","الجهة اليمنى","الخلف","الجهة اليسرى","الداخل"],sideHints:["الصدّام، الغطاء، اللوحة","الأبواب والعجلات","الصندوق واللوحة","الأبواب والعجلات","المقاعد والعدّاد"],
+ qDash:"صورة العدّاد",dashHint:"شغّل السيارة. يجب أن يظهر مجموع الكيلومترات والبنزين.",dashOdo:"لا يظهر إلا TRIP؟ اضغط على زرّ العدّاد حتى يظهر المجموع (ODO).",dashKinds:["بالإبر","رقمي","شاشة"],takePhoto:"التقط الصورة",read:"قراءة تلقائية",km:"الكيلومترات (المجموع)",fuel:"البنزين",right:"صحيح",fix:"تصحيح",tapFuel:"اضغط على مستوى البنزين",empty:"فارغ",full:"ممتلئ",kmLow:k=>`أقل من المرّة الفارطة (${k} كم). تثبّت.`,
+ qDmg:"هل هذه الأضرار صحيحة؟",dmgOf:(a,b)=>`${a} من ${b}`,isDmg:"هل هذا ضرر فعلًا؟",yes:"نعم",no:"لا",noDmg:"لا توجد أضرار ✓",
+ qDays:"كم يوم؟",days:"أيام",backOn:"الرجوع يوم",price:"السعر",perDay:"السعر في اليوم",total:"المجموع",typeIt:"اكتب المبلغ",
+ qDep:"الضمان",depAmount:"مبلغ الضمان",depHow:"طريقة الدفع؟",cash:"نقدًا",card:"بطاقة",cheque:"صك",
+ finishOut:"تأكيد الخروج",finishIn:"تأكيد الرجوع",
+ outDone:"خرجت السيارة ✓",outL:["تمّ حفظ الفيديو والصور","تمّ تسجيل الضمان","تذكير واتساب قبل الرجوع بـ12 ساعة"],
+ qCarIn:"أيّ سيارة رجعت؟",lateTag:"متأخرة",expected:"منتظرة",
+ fuelMiss:x=>`ينقص ${x} من البنزين`,fuelOk:"الخزّان ممتلئ ✓",
+ qNew:"ضرر جديد؟",before:"عند الخروج",after:"عند الرجوع",
+ qMoney:"المال",depGot:"الضمان المقبوض",fuelCost:"البنزين الناقص",dmgCost:"الأضرار",giveBack:"يُرجَع للحريف",stillDue:"يبقى على الحريف",
+ inDone:"رجعت السيارة ✓",inL:["تمّ إنشاء الفاتورة","تمّ إرسال التقرير للحريف على واتساب","تمّ إرجاع الضمان"],
+ planT:"الجدول",stFree:"شاغرة",stRented:d=>`مكتراة · ترجع ${d}`,stBooked:d=>`محجوزة · ${d}`,stLate:h=>`متأخرة ${h} س`,search:"ابحث عن سيارة شاغرة",from:"من",to:"إلى",nFree:n=>`${n} سيارات شاغرة`,
+ reqT:"الطلبات",wantsBook:n=>`${n} يريد الحجز`,wantsMore:(n,d)=>`${n} يريد ${d} أيام إضافية`,docsSent:"أرسل بطاقة التعريف والرخصة",seeDocs:"عرض الوثائق",hideDocs:"إخفاء الوثائق",
+ accept:"قبول",refuse:"رفض",nothing:"لا شيء للمعالجة ✓",accepted:"تمّ القبول ✓ · أُرسلت رسالة للحريف",acceptedPrice:x=>`تمّ القبول ✓ · أُرسل السعر للحريف: ${x}`,refused:"تمّ الرفض · أُرسلت رسالة للحريف",bookedAfter:"غير ممكن: السيارة محجوزة بعد ذلك",
+ bossT:"فضاء صاحب الوكالة",month:"هذا الشهر",ca:"رقم المعاملات",occ:"نسبة الكراء",repairs:"الإصلاحات",dep:"المحجوز من الضمانات",maint:"صيانة مطلوبة",team:"الفريق",perCar:"حسب السيارة",
+ maintL:["Dacia Logan · المعلوم منتهي: لا يمكن أن تخرج","Kia Picanto · الفحص الفني بعد 14 يومًا","Renault Clio · تغيير الزيت بعد 220 كم"],
+ teamL:[["Ahmed K.","21 خروج هذا الشهر"],["Mouna T.","17 خروج هذا الشهر"],["Hedi S.","12 خروج هذا الشهر"]],
+ days7:["الأحد","الإثنين","الثلاثاء","الأربعاء","الخميس","الجمعة","السبت"],tomorrow:"غدًا",today:"اليوم",yesterday:"أمس",d3:["أحد","اثنين","ثلاثاء","أربعاء","خميس","جمعة","سبت"],
+ cars:"السيارات",carsS:"الحالة، الكيلومترات، الصيانة",teamTile:"الفريق",teamS:"من يفعل ماذا",maintAlert:n=>`${n} سيارات تحتاج متابعة`,
+ legend:{free:"شاغرة",rented:"مكتراة",booked:"محجوزة",late:"متأخرة"},week:"الأيام السبعة القادمة",fleet:n=>`الأسطول · ${n} سيارات`,addCar:"إضافة سيارة",edit:"تعديل",
+ fModel:"النوع والموديل",fPlate:"اللوحة",fKm:"الكيلومترات",fDash:"نوع العدّاد",fOil:"تغيير الزيت القادم عند (كم)",fIns:"التأمين إلى غاية",fVis:"الفحص الفني إلى غاية",fVig:"المعلوم إلى غاية",save:"حفظ",
+ newCar:"سيارة جديدة",editCar:"تعديل السيارة",remove:"حذف من الأسطول",removeQ:n=>`حذف ${n}؟`,removeL:"لن تُقترح للخروج ولا للحرفاء. يبقى تاريخها محفوظًا.",yesRemove:"نعم، احذف",cancel:"إلغاء",cantRemove:"غير ممكن: السيارة مكتراة. انتظر رجوعها.",
+ need:"اكتب الموديل واللوحة والكيلومترات.",needName:"اكتب اسم الموظّف.",
+ carsT:"السيارات",sum:(n,f)=>`${n} سيارات · ${f} شاغرة`,allOk:"كل شيء على ما يرام",oilName:"تغيير الزيت",
+ oilIn:k=>`تغيير الزيت بعد ${k} كم`,oilLate:k=>`تجاوز موعد تغيير الزيت بـ${k} كم`,oilDone:"تمّ تغيير الزيت",oilDoneOk:"تمّ تسجيل تغيير الزيت ✓",
+ paperOk:d=>`إلى غاية ${d}`,paperSoon:n=>`ينتهي بعد ${n} يومًا`,paperBad:"منتهي",ins:"التأمين",vis:"الفحص الفني",vig:"المعلوم",
+ maintH:"الصيانة والوثائق",histH:"التاريخ",noHist:"لا شيء حاليًا",kmNow:"الكيلومترات",dashT:"العدّاد",blocked:"وثيقة منتهية: لا يمكن أن تخرج",
+ teamT:"الفريق",whoWhat:"من يهتمّ بماذا",journal:"السجلّ: من فعل ماذا",all:"الكل",addStaff:"إضافة موظّف",newStaff:"موظّف جديد",editStaff:"تعديل الموظّف",
+ fName:"الاسم",fTel:"واتساب",fJobs:"يهتمّ بـ",lastAct:"آخر عملية",removeStaff:"حذف الموظّف",ownerOnly:"صاحب الوكالة فقط يمكنه إضافة سيارة أو تعديلها أو حذفها.",
+ jobs:{out:"الخروج",in:"الرجوع",book:"الحجوزات",maint:"الصيانة",cash:"الخزينة"},
+ logK:{out:"خروج",in:"رجوع",book:"قبول حجز",more:"قبول تمديد",oil:"تغيير الزيت",add:"إضافة سيارة",edit:"تعديل سيارة",remove:"حذف سيارة",staff:"إضافة موظّف"}}};
+
+/* ---------- icônes (traits simples) ---------- */
+const I={
+ out:'<svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 15l1.6-4.5A2 2 0 016.5 9h7a2 2 0 011.9 1.5L17 15"/><rect x="2" y="15" width="16" height="4" rx="1"/><circle cx="6" cy="19" r="1.4"/><circle cx="14" cy="19" r="1.4"/><path d="M18 6h4m0 0l-2-2m2 2l-2 2"/></svg>',
+ in:'<svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 15l1.6-4.5A2 2 0 0110.5 9h7a2 2 0 011.9 1.5L21 15"/><rect x="6" y="15" width="16" height="4" rx="1"/><circle cx="10" cy="19" r="1.4"/><circle cx="18" cy="19" r="1.4"/><path d="M6 6H2m0 0l2-2M2 6l2 2"/></svg>',
+ plan:'<svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/><path d="M7 14h3M14 14h3M7 17h3"/></svg>',
+ req:'<svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v12H8l-4 4z"/><path d="M8 9h8M8 12h5"/></svg>',
+ boss:'<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>',
+ back:'<svg class="flip" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>',
+ cam:'<svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>',
+ video:'<svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="2" y="6" width="14" height="12" rx="2"/><path d="M16 10l6-3v10l-6-3z"/></svg>',
+ check:'<svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"/></svg>',
+ tick:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="color:var(--out);flex:none"><path d="M5 12.5l4.5 4.5L19 7"/></svg>',
+ team:'<svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><circle cx="17" cy="9" r="2.6"/><path d="M15.5 14.2c3 .2 5.5 2.6 5.5 5.8"/></svg>',
+ fleet:'<svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14l1.6-4.5A2 2 0 017.5 8h9a2 2 0 011.9 1.5L20 14"/><rect x="3" y="14" width="18" height="4" rx="1"/><circle cx="7" cy="18" r="1.4"/><circle cx="17" cy="18" r="1.4"/><path d="M8 4h8"/></svg>',
+ car:'<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14l1.6-4.5A2 2 0 017.5 8h9a2 2 0 011.9 1.5L20 14"/><rect x="3" y="14" width="18" height="4" rx="1"/><circle cx="7" cy="18" r="1.4"/><circle cx="17" cy="18" r="1.4"/></svg>'};
+
+/* ---------- données d'exemple ---------- */
+const DAY=864e5,now=new Date();now.setMinutes(0,0,0);
+const at=(d,h)=>{const x=new Date(now);x.setHours(0,0,0,0);return new Date(x.getTime()+d*DAY+h*36e5)};
+let S;
+function fresh(){S={lang:(()=>{try{return localStorage.getItem("cc-lang")||"fr"}catch(e){return"fr"}})(),role:"staff",screen:"home",step:0,f:{},
+ cars:[{id:"peugeot",n:"Peugeot 208",p:"123 TU 4567",price:90,st:"rented",ret:at(1,10),client:"Karim B.",tel:"+216 22 111 333",km:45210,dt:1,oil:50000,ins:iso(at(140,0)),vis:iso(at(200,0)),vig:iso(at(130,0))},
+  {id:"kia",n:"Kia Picanto",p:"204 TU 1188",price:80,st:"booked",start:at(0,15),client:"Salma R.",tel:"+216 55 444 333",lic:"2029-03-31",km:31200,dt:1,oil:40000,ins:iso(at(90,0)),vis:iso(at(14,0)),vig:iso(at(130,0))},
+  {id:"dacia",n:"Dacia Logan",p:"188 TU 9021",price:100,st:"late",ret:at(0,-14),client:"Leila M.",tel:"+216 97 123 456",km:88410,dt:0,oil:95000,ins:iso(at(60,0)),vis:iso(at(150,0)),vig:iso(at(-5,0))},
+  {id:"tucson",n:"Hyundai Tucson",p:"231 TU 3340",price:180,st:"free",km:22050,dt:2,oil:32050,ins:iso(at(300,0)),vis:iso(at(330,0)),vig:iso(at(130,0))},
+  {id:"clio",n:"Renault Clio",p:"240 TU 5512",price:85,st:"free",km:57300,dt:0,oil:57520,ins:iso(at(25,0)),vis:iso(at(120,0)),vig:iso(at(130,0))}],
+ staff:[{id:"ahmed",n:"Ahmed K.",tel:"+216 20 300 111",jobs:["out","in","cash"]},{id:"mouna",n:"Mouna T.",tel:"+216 50 300 222",jobs:["book","cash"]},{id:"hedi",n:"Hedi S.",tel:"+216 92 300 333",jobs:["maint","out"]}],
+ log:[{who:"mouna",k:"book",car:"kia",at:at(-1,16),x:"Salma R."},{who:"ahmed",k:"out",car:"peugeot",at:at(-1,9),x:"Karim B."},{who:"ahmed",k:"in",car:"clio",at:at(-2,18),x:"Nabil H."},
+  {who:"hedi",k:"oil",car:"tucson",at:at(-2,11)},{who:"ahmed",k:"out",car:"dacia",at:at(-4,10),x:"Leila M."},{who:"mehdi",k:"add",car:"tucson",at:at(-30,12)}],
+ reqs:[{id:1,kind:"book",n:"Sami Ben Ali",tel:"+216 98 111 222",car:"Hyundai Tucson",from:at(3,10),to:at(5,10),docs:true,open:false,done:null},
+  {id:2,kind:"more",n:"Karim B.",tel:"+216 22 111 333",car:"Peugeot 208",days:2,done:null,booked:false},
+  {id:3,kind:"more",n:"Leila M.",tel:"+216 97 123 456",car:"Dacia Logan",days:3,done:null,booked:true}]}}
+const t=()=>T[S.lang];
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const p2=n=>String(n).padStart(2,"0");
+const dshort=d=>{const L=t();const diff=Math.round((new Date(d).setHours(0,0,0,0)-new Date(now).setHours(0,0,0,0))/DAY);
+  const day=diff===0?L.today:diff===1?L.tomorrow:diff===-1?L.yesterday:`${L.days7[d.getDay()]} ${p2(d.getDate())}/${p2(d.getMonth()+1)}`;return`${day} ${p2(d.getHours())}:${p2(d.getMinutes())}`};
+const iso=d=>`${d.getFullYear()}-${p2(d.getMonth()+1)}-${p2(d.getDate())}`;
+fresh();
+/* ---------- flotte, entretien, journal ---------- */
+const ME=()=>S.role==="owner"?"mehdi":"ahmed";
+const whoName=id=>id==="mehdi"?"Mehdi A.":(S.staff.find(x=>x.id===id)||{n:id}).n;
+const carName=id=>{const c=S.cars.find(x=>x.id===id);return c?c.n:""};
+const active=()=>S.cars.filter(c=>!c.gone);
+function log(k,car,x){S.log.unshift({who:ME(),k,car,at:new Date(),x:x||""})}
+const nf=n=>Number(n).toLocaleString("fr-FR");
+const daysTo=d=>Math.round((new Date(d+"T00:00")-new Date(iso(now)+"T00:00"))/DAY);
+const fmtD=d=>{const x=new Date(d+"T00:00");return`${p2(x.getDate())}/${p2(x.getMonth()+1)}/${x.getFullYear()}`};
+function papers(c){return[["ins",c.ins],["vis",c.vis],["vig",c.vig]].filter(([,d])=>d).map(([k,d])=>{const n=daysTo(d);return{k,d,n,lvl:n<0?2:n<=30?1:0}})}
+function oilState(c){const left=c.oil-c.km;return{left,lvl:left<0?2:left<=1000?1:0}}
+const carLvl=c=>Math.max(oilState(c).lvl,...papers(c).map(p=>p.lvl));
+const blocked=c=>papers(c).some(p=>p.lvl===2);
+function issueText(c){const L=t(),ps=papers(c),o=oilState(c),list=[];
+ ps.filter(p=>p.lvl===2).forEach(p=>list.push(`${L[p.k]} : ${L.paperBad}`));if(o.lvl===2)list.push(L.oilLate(nf(-o.left)));
+ ps.filter(p=>p.lvl===1).forEach(p=>list.push(`${L[p.k]} : ${L.paperSoon(p.n)}`));if(o.lvl===1)list.push(L.oilIn(nf(o.left)));
+ return list.length?list[0]+(list.length>1?` (+${list.length-1})`:""):""}
+function stChip(c){const L=t();return c.st==="late"?`<span class="st late">${L.stLate(Math.max(1,Math.round((now-c.ret)/36e5)))}</span>`:c.st==="rented"?`<span class="st rented">${L.stRented(dshort(c.ret))}</span>`
+  :c.st==="booked"?`<span class="st booked">${L.stBooked(dshort(c.start))}</span>`:`<span class="st free">${L.stFree}</span>`}
+function dayState(c,i){const d0=at(i,0),d1=at(i+1,0);
+ if(c.st==="late"&&i===0)return"late";if(c.st==="rented"&&c.ret&&d0<c.ret)return"rented";
+ const bs=(c.books||[]).concat(c.st==="booked"&&c.start?[{a:c.start,b:new Date(c.start.getTime()+2*DAY)}]:[]);
+ return bs.some(b=>b.a<d1&&b.b>d0)?"booked":"free"}
+const logRow=l=>{const L=t();return`<div class="logrow"><span class="when">${dshort(l.at)}</span><b><bdi>${esc(whoName(l.who))}</bdi> · ${L.logK[l.k]}</b><span>${[carName(l.car),l.x].filter(Boolean).map(x=>`<bdi>${esc(x)}</bdi>`).join(" · ")||"&nbsp;"}</span></div>`};
+
+/* ---------- photos dessinées (exemples) ---------- */
+function shot(kind){const panel=`<rect width="160" height="100" fill="#2b3036"/><path d="M0 18 Q80 6 160 18 L160 82 Q80 90 0 82Z" fill="#9aa6b2"/><path d="M0 48 Q80 41 160 48" stroke="#6f7c88" stroke-width="1.2" fill="none"/>`;
+ const mk={scratch:`<path d="M40 60 l18 -2 l16 3 l22 -3 l20 2 l20 -2" stroke="#fff" stroke-width="2.4" fill="none" stroke-linecap="round"/>`,
+  dent:`<ellipse cx="86" cy="55" rx="24" ry="13" fill="#2a3138" fill-opacity=".45"/>`,
+  reflect:`<path d="M30 30 L130 24" stroke="#fff" stroke-opacity=".55" stroke-width="7" stroke-linecap="round"/>`,clean:""}[kind]||"";
+ const ring=kind!=="clean"?`<rect x="2" y="2" width="156" height="96" rx="5" fill="none" stroke="#f2b705" stroke-width="3"/>`:"";
+ return`<svg viewBox="0 0 160 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">${panel}${mk}${ring}</svg>`}
+function dash(km,e8,dt){const K=String(km).padStart(6,"0");
+ if(dt===1){const bars=Array.from({length:8},(_,i)=>`<rect x="${150+i*7}" y="${78-i*6}" width="5" height="${8+i*6}" rx="1" fill="${i<e8?"#9be15d":"#26303a"}"/>`).join("");
+  return`<svg viewBox="0 0 220 110" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><rect width="220" height="110" fill="#0d1114"/><rect x="14" y="14" width="192" height="82" rx="10" fill="#1b2a22" stroke="#33463a"/>
+  <text x="26" y="44" font-family="monospace" font-size="11" fill="#7f9c86">TRIP A</text><text x="76" y="44" font-family="monospace" font-size="14" fill="#9be15d">312.4</text>
+  <text x="26" y="78" font-family="monospace" font-size="11" fill="#c8f0a8">ODO</text><text x="60" y="80" font-family="monospace" font-size="20" font-weight="bold" fill="#c8f0a8">${K}</text><text x="60" y="92" font-family="monospace" font-size="8" fill="#7f9c86">km</text>
+  ${bars}<text x="150" y="30" font-family="sans-serif" font-size="9" fill="#7f9c86">E</text><text x="200" y="30" font-family="sans-serif" font-size="9" fill="#7f9c86">F</text></svg>`}
+ if(dt===2){const pct=Math.round(e8/8*100);
+  return`<svg viewBox="0 0 220 110" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><rect width="220" height="110" fill="#05070a"/><rect x="8" y="8" width="204" height="94" rx="8" fill="#0e1622"/>
+  <circle cx="60" cy="56" r="34" fill="none" stroke="#1d2b3d" stroke-width="7"/><path d="M34 78 A34 34 0 1 1 86 78" fill="none" stroke="#3aa0ff" stroke-width="7" stroke-linecap="round" stroke-dasharray="${e8/8*165} 300"/>
+  <text x="60" y="60" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="bold" fill="#e8f1ff">${pct}%</text>
+  <text x="112" y="34" font-family="sans-serif" font-size="9" fill="#7f93ad">Autonomie</text><text x="112" y="48" font-family="sans-serif" font-size="13" fill="#e8f1ff">${e8*55} km</text>
+  <text x="112" y="72" font-family="sans-serif" font-size="9" fill="#7f93ad">Total</text><text x="112" y="88" font-family="sans-serif" font-size="15" font-weight="bold" fill="#e8f1ff">${km.toLocaleString("fr-FR")} km</text></svg>`}
+ const a=(150+e8/8*60)*Math.PI/180,cx=165,cy=62;
+ return`<svg viewBox="0 0 220 110" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><rect width="220" height="110" fill="#101418"/>
+ <circle cx="62" cy="55" r="44" fill="#1a2027" stroke="#2c3540" stroke-width="3"/>${Array.from({length:9},(_,i)=>{const g=(135+i*33.75)*Math.PI/180;return`<line x1="${62+36*Math.cos(g)}" y1="${55+36*Math.sin(g)}" x2="${62+42*Math.cos(g)}" y2="${55+42*Math.sin(g)}" stroke="#c9d1d9" stroke-width="2"/>`}).join("")}
+ <line x1="62" y1="55" x2="38" y2="34" stroke="#ff8a3d" stroke-width="3" stroke-linecap="round"/>
+ <rect x="29" y="70" width="66" height="16" rx="2" fill="#efe9dc"/>${K.split("").map((d,i)=>`<text x="${33+i*10.5}" y="82" font-family="monospace" font-size="12" font-weight="bold" fill="#111">${d}</text>`).join("")}
+ <circle cx="${cx}" cy="${cy}" r="38" fill="#1a2027" stroke="#2c3540" stroke-width="3"/>
+ <line x1="${cx}" y1="${cy}" x2="${cx+30*Math.cos(a)}" y2="${cy+30*Math.sin(a)}" stroke="#ff8a3d" stroke-width="3" stroke-linecap="round"/><circle cx="${cx}" cy="${cy}" r="4" fill="#ff8a3d"/>
+ <text x="${cx-32}" y="${cy+20}" font-size="10" fill="#c9d1d9" font-family="sans-serif">0</text><text x="${cx-5}" y="${cy-24}" font-size="9" fill="#c9d1d9" font-family="sans-serif">1/2</text><text x="${cx+26}" y="${cy+20}" font-size="10" fill="#c9d1d9" font-family="sans-serif">1</text></svg>`}
+const frac=e8=>{const L=t();if(e8<=0)return L.empty;if(e8>=8)return L.full;const g=e8%4===0?4:e8%2===0?2:1;return`${e8/g}/${8/g}`};
+const gauge=e8=>`<div class="gauge">${Array.from({length:8},(_,i)=>`<i class="${i<e8?"on":""}"></i>`).join("")}</div>`;
+
+/* ---------- squelette commun ---------- */
+function frame(inner,{title,color,back=true}={}){const L=t();
+ return`<header class="top">${back&&S.screen!=="home"?`<button class="iconbtn" data-act="back" aria-label="${L.back}">${I.back}</button>`:""}
+   <div class="who"><b>${title||"Car Check"}</b><span>${S.role==="owner"?"Mehdi A. · "+L.owner:"Ahmed K. · "+L.staff}</span></div>
+   <button class="pill-btn" data-act="lang">${L.lang}</button></header>
+  <main style="--c:var(--${color||"out"})">${inner}</main>`}
+function wizard(total,inner,{color,nextOk=true,nextLabel,noNext=false}={}){const L=t();
+ return`<div class="prog" style="--c:var(--${color})">${Array.from({length:total},(_,i)=>`<i class="${i<=S.step?"on":""}"></i>`).join("")}</div>
+  <div class="stepno">${L.step(S.step+1,total)}</div>${inner}<div class="spacer"></div>
+  ${noNext?"":`<div class="footer"><button class="big" data-act="next" ${nextOk?"":"disabled"}>${nextLabel||L.next}</button></div>`}`}
+
+/* ---------- accueil ---------- */
+function home(){const L=t(),own=S.role==="owner";const late=S.cars.filter(c=>c.st==="late").length,ret=S.cars.filter(c=>c.st==="rented"&&c.ret<at(1,0)).length+late;
+ const reqs=S.reqs.filter(r=>!r.done).length,maint=active().filter(c=>carLvl(c)>0).length;
+ return frame(`<h1>${L.hello} ${own?"Mehdi":"Ahmed"}</h1>
+  <div class="alerts">${late?`<button class="alert bad" data-go="plan"><span class="dot"></span>${L.late(late)}</button>`:""}
+   ${reqs?`<button class="alert req" data-go="req"><span class="dot"></span>${L.reqs(reqs)}</button>`:""}
+   ${maint?`<button class="alert plan" data-go="cars"><span class="dot"></span>${L.maintAlert(maint)}</button>`:""}
+   <button class="alert in" data-go="plan"><span class="dot"></span>${L.retToday(ret)}</button></div>
+  <div class="tiles">
+   <button class="tile out" data-go="out"><span class="ic">${I.out}</span><span>${L.out}<small>${L.outS}</small></span></button>
+   <button class="tile in" data-go="in"><span class="ic">${I.in}</span><span>${L.in}<small>${L.inS}</small></span></button>
+   <button class="tile plan" data-go="plan"><span class="ic">${I.plan}</span><span>${L.plan}<small>${L.planS}</small></span></button>
+   <button class="tile req" data-go="req">${reqs?`<span class="badge">${reqs}</span>`:""}<span class="ic">${I.req}</span><span>${L.req}<small>${L.reqS}</small></span></button>
+   <button class="tile cars ${own?"":"wide"}" data-go="cars"><span class="ic">${I.fleet}</span><span>${L.cars}<small>${L.carsS}</small></span></button>
+   ${own?`<button class="tile team" data-go="team"><span class="ic">${I.team}</span><span>${L.teamTile}<small>${L.teamS}</small></span></button>
+   <button class="tile boss" data-go="boss"><span class="ic">${I.boss}</span><span>${L.boss}<small>${L.bossS}</small></span></button>`:""}
+  </div>
+  <div class="spacer"></div>
+  <button class="pill-btn" data-act="role" style="align-self:center">${own?L.asStaff:L.asOwner}</button>`,{back:false})}
+
+/* ---------- SORTIE ---------- */
+const OUT_STEPS=["car","client","lic","film","dash","dmg","days","dep"];
+function outFlow(){const L=t(),F=S.f,k=OUT_STEPS[S.step],total=OUT_STEPS.length;let inner="",ok=true,label;
+ if(k==="car"){const booked=active().filter(c=>c.st==="booked"),free=active().filter(c=>c.st==="free");
+  const item=(c,extra)=>`<button class="choice ${F.car===c.id?"sel":""}" data-pick="${c.id}" ${blocked(c)?"disabled":""}><span class="carico">${I.car}</span><span><b>${c.n}</b><span>${c.p}${extra||""}${blocked(c)?`<br><b style="color:var(--bad);display:inline">${L.blocked}</b>`:""}</span></span></button>`;
+  inner=`<h1>${L.qCarOut}</h1>${booked.length?`<div class="group">${L.bookedToday}</div>${booked.map(c=>item(c,` · ${esc(c.client)} · ${p2(c.start.getHours())}:00`)).join("")}`:""}
+   <div class="group">${L.free}</div>${free.map(c=>item(c)).join("")}`;ok=!!F.car}
+ if(k==="client"){const c=S.cars.find(x=>x.id===F.car);
+  inner=`<h1>${L.qClient}</h1>${c.st==="booked"?`<div class="okmsg">${I.tick}${L.fromBooking}</div>`:""}
+   <div class="field"><label for="f-n">${L.name}</label><input id="f-n" type="text" value="${esc(F.name||"")}" autocomplete="off"></div>
+   <div class="field"><label for="f-t">${L.phone}</label><input id="f-t" type="tel" dir="ltr" value="${esc(F.tel||"")}"></div>
+   <div class="field"><label>${L.msgLang}</label><div class="seg"><button data-cl="fr" class="${F.cl==="fr"?"sel":""}">Français</button><button data-cl="ar" class="${F.cl==="ar"?"sel":""}">العربية</button></div></div>`;
+  ok=!!(F.name&&F.tel)}
+ if(k==="lic"){const c=S.cars.find(x=>x.id===F.car),bad=F.lic&&F.lic<iso(at(F.days||3,0));
+  inner=`<h1>${L.qLic}</h1>${c.st==="booked"?`<div class="okmsg">${I.tick}${L.licChecked}</div>`:""}
+   <div class="field"><label for="f-l">${L.licUntil}</label><input id="f-l" type="date" value="${F.lic||""}"></div>
+   ${bad?`<div class="badmsg">${L.licBad}</div>`:""}
+   ${F.licPhoto||c.st==="booked"?`<div class="okmsg">${I.tick}${L.licDone}</div>`:`<button class="cam" data-act="licphoto"><span class="ic">${I.cam}</span>${L.licPhoto}</button>`}`;
+  ok=!!F.lic&&!bad&&(F.licPhoto||c.st==="booked")}
+ if(k==="film"){inner=film();ok=!!F.film}
+ if(k==="dash"){inner=dashStep();ok=!!F.dashOk}
+ if(k==="dmg"){inner=dmgStep(F.dmgs);ok=F.dmgs.every(d=>d.ans)}
+ if(k==="days"){const n=F.days||3,r=new Date(now.getTime()+n*DAY);
+  inner=`<h1>${L.qDays}</h1><div class="stepper"><button data-act="minus" aria-label="−">−</button><output>${n}<small>${L.days}</small></output><button data-act="plus" aria-label="+">+</button></div>
+   <div class="infobox"><span>${L.backOn} <b>${dshort(r)}</b></span></div>
+   <div class="field"><label for="f-price">${L.perDay}</label><div class="money-in"><input id="f-price" type="number" inputmode="numeric" min="1" dir="ltr" placeholder="${L.typeIt}" value="${F.price||""}"><span>DT</span></div></div>
+   <div class="infobox" id="price-total" ${F.price?"":"hidden"}><span>${L.total} <b dir="ltr">${n} × ${F.price||0} = ${n*(F.price||0)} DT</b></span></div>`;ok=F.price>0}
+ if(k==="dep"){inner=`<h1>${L.qDep}</h1>
+   <div class="field"><label for="f-dep">${L.depAmount}</label><div class="money-in"><input id="f-dep" type="number" inputmode="numeric" min="0" dir="ltr" placeholder="${L.typeIt}" value="${F.dep??""}"><span>DT</span></div></div>
+   <div class="field"><label>${L.depHow}</label><div class="seg"><button data-pay="cash" class="${(F.pay||"cash")==="cash"?"sel":""}">${L.cash}</button><button data-pay="card" class="${F.pay==="card"?"sel":""}">${L.card}</button><button data-pay="cheque" class="${F.pay==="cheque"?"sel":""}">${L.cheque}</button></div></div>`;
+  ok=F.dep!=null&&F.dep!=="";label=L.finishOut}
+ return frame(wizard(total,inner,{color:"out",nextOk:ok,nextLabel:label}),{title:L.out,color:"out"})}
+
+/* tournage guidé (simulation : 1 s = 0,1 s) */
+let filmTimer=null;
+function film(){const L=t(),F=S.f;
+ if(F.film)return`<h1>${L.qFilm}</h1><div class="photo">${shot("clean")}</div><div class="okmsg">${I.tick}${L.filmOk} · 1:26</div><button class="big light" data-act="refilm">${L.filmAgain}</button>`;
+ if(!F.rec)return`<h1>${L.qFilm}</h1><p class="sub">${L.filmHint}</p><button class="cam" data-act="startfilm"><span class="ic">${I.video}</span>${L.filmStart}</button>`;
+ return`<div class="viewfinder"><div class="vf-top"><b id="vf-s"></b><span id="vf-h"></span></div><div class="vf-arrow" id="vf-a">⬆</div>
+  <div class="vf-bot"><span class="vf-time" id="vf-t">0:00</span><span class="vf-dots">${L.sides.map(()=>"<i></i>").join("")}</span><button class="vf-btn" id="vf-b" data-act="stopfilm" disabled></button></div></div>`}
+function runFilm(){const L=t(),F=S.f;if(!F.rec||F.film)return;clearInterval(filmTimer);const secs=[15,22,15,22,12],arrows=["⬆","➡","⬇","⬅","⟳"];
+ if(S.lang==="ar"){arrows[1]="⬅";arrows[3]="➡"}
+ const ui=()=>{let tt=F.t,st=0;while(st<4&&tt>=secs[st]){tt-=secs[st];st++}
+  const s=$("#vf-s");if(!s)return;s.textContent=`${st+1}/5 · ${L.sides[st]}`;$("#vf-h").textContent=L.sideHints[st];$("#vf-a").textContent=arrows[st];
+  $("#vf-t").textContent=`${Math.floor(F.t/60)}:${p2(F.t%60)}`;document.querySelectorAll(".vf-dots i").forEach((d,i)=>d.classList.toggle("on",i<=st));
+  const b=$("#vf-b");if(F.t<45){b.disabled=true;b.textContent=L.filmLeft(45-F.t)}else{b.disabled=false;b.textContent="■ "+L.filmStop}};
+ ui();filmTimer=setInterval(()=>{F.t=Math.min(86,F.t+1);ui()},100)}
+
+function dashStep(){const L=t(),F=S.f,back=S.screen==="in",c=S.cars.find(x=>x.id===F.car);
+ if(!F.dashShot)return`<h1>${L.qDash}</h1><p class="sub">${L.dashHint}</p>
+  <div class="examples">${[0,1,2].map(k=>`<figure>${dash(123456,4,k)}<figcaption>${L.dashKinds[k]}</figcaption></figure>`).join("")}</div>
+  <div class="infobox">${L.dashOdo}</div><button class="cam" data-act="dashshot"><span class="ic">${I.cam}</span>${L.takePhoto}</button>`;
+ const km=F.km,e8=F.e8,low=km<c.km;
+ return`<h1>${L.qDash}</h1><div class="photo">${dash(km,e8,c.dt)}</div><span class="dtype">${L.read} · ${L.dashKinds[c.dt]}</span>
+  ${F.fixing?`<div class="field"><label for="f-km">${L.km}</label><input id="f-km" type="number" inputmode="numeric" dir="ltr" value="${km}"></div>
+   <div class="badmsg" id="kmlow" ${low?"":"hidden"}>${L.kmLow(c.km.toLocaleString("fr-FR"))}</div>
+   <div class="field"><label>${L.tapFuel}</label><div class="gauge tap">${Array.from({length:8},(_,i)=>`<button data-e8="${i+1}" class="${i<e8?"on":""}" aria-label="${frac(i+1)}"></button>`).join("")}</div>
+   <div class="gauge-ends"><button class="pill-btn" data-e8="0" style="color:var(--ink);border-color:var(--line)">${L.empty}</button><b>${frac(e8)}</b><span>${L.full}</span></div></div>`
+  :`<div class="reading"><div><b dir="ltr">${km.toLocaleString("fr-FR")}</b><span>${L.km}</span></div><div>${gauge(e8)}<b style="font-size:1.2rem;margin-top:6px">${frac(e8)}</b><span>${L.fuel}</span></div></div>`}
+  ${back?`<div class="${F.out8>e8?"badmsg":"okmsg"}">${F.out8>e8?L.fuelMiss(frac(F.out8-e8)):I.tick+L.fuelOk}</div>`:""}
+  ${F.dashOk?`<div class="okmsg">${I.tick}${L.right}</div><button class="big light" data-act="dashfix">${L.fix}</button>`:F.fixing?`<button class="big" data-act="dashok">${L.right}</button>`:`<div class="yesno"><button class="big" data-act="dashok">${L.right}</button><button class="big light" data-act="dashfix">${L.fix}</button></div>`}`}
+
+function dmgStep(list){const L=t(),i=list.findIndex(d=>!d.ans),cur=list[i];const back=S.screen==="in";
+ if(!list.length||i<0){const kept=list.filter(d=>d.ans==="yes");
+  return`<h1>${back?L.qNew:L.qDmg}</h1>${kept.length?kept.map(d=>`<div class="infobox"><b>${d.label[S.lang]}</b></div>`).join(""):`<div class="okmsg">${I.tick}${L.noDmg}</div>`}`}
+ return`<h1>${back?L.qNew:L.isDmg}</h1><div class="stepno">${L.dmgOf(i+1,list.length)}</div>
+  ${back?`<div class="pair"><figure><div class="photo">${shot("clean")}</div><figcaption>${L.before}</figcaption></figure><figure><div class="photo">${shot(cur.kind)}</div><figcaption>${L.after}</figcaption></figure></div>`
+   :`<div class="photo">${shot(cur.kind)}</div>`}
+  <div class="infobox"><b style="font-size:1.2rem">${cur.label[S.lang]}</b></div>
+  <div class="yesno"><button class="big" data-ans="yes">✓ ${L.yes}</button><button class="big no" data-ans="no">✗ ${L.no}</button></div>`}
+
+/* ---------- RETOUR ---------- */
+const IN_STEPS=["car","film","dash","dmg","money"];
+function inFlow(){const L=t(),F=S.f,k=IN_STEPS[S.step],total=IN_STEPS.length;let inner="",ok=true,label;
+ if(k==="car"){const out=S.cars.filter(c=>c.st==="rented"||c.st==="late").sort((a,b)=>(b.st==="late")-(a.st==="late"));
+  inner=`<h1>${L.qCarIn}</h1>${out.map(c=>`<button class="choice ${c.st==="late"?"late":""} ${F.car===c.id?"sel":""}" data-pick="${c.id}"><span class="carico">${I.car}</span>
+   <span><b>${c.n}</b><span>${c.p} · ${esc(c.client)}<br>${c.st==="late"?`<b style="color:var(--bad);display:inline">${L.lateTag}</b> · `:""}${L.expected} ${dshort(c.ret)}</span></span></button>`).join("")}`;ok=!!F.car}
+ if(k==="film"){inner=film();ok=!!F.film}
+ if(k==="dash"){inner=dashStep();ok=!!F.dashOk}
+ if(k==="dmg"){inner=dmgStep(F.dmgs);ok=F.dmgs.every(d=>d.ans)}
+ if(k==="money"){const fuel=Math.max(0,F.out8-F.e8)/8*45*2.5+(F.out8>F.e8?10:0),dmg=F.dmgs.some(d=>d.ans==="yes")?(F.dmgCost??150):0,dep=F.dep??300,t=fuel+dmg,back=Math.max(0,dep-t),due=Math.max(0,t-dep);
+  inner=`<h1>${L.qMoney}</h1><div class="money">
+   <div class="mrow"><span>${L.depGot}</span><b dir="ltr">${dep} DT</b></div>
+   <div class="mrow"><span>− ${L.fuelCost}</span><b dir="ltr">${fuel.toFixed(0)} DT</b></div>
+   ${dmg||F.dmgs.some(d=>d.ans==="yes")?`<div class="mrow"><span>− ${L.dmgCost}</span><input id="f-dmg" type="number" dir="ltr" min="0" step="10" value="${dmg}"></div>`:""}
+   <div class="mrow total"><span>${L.giveBack}</span><b dir="ltr">${back.toFixed(0)} DT</b></div>
+   ${due?`<div class="badmsg">${L.stillDue} <bdi dir="ltr">${due.toFixed(0)} DT</bdi></div>`:""}</div>`;label=L.finishIn}
+ return frame(wizard(total,inner,{color:"in",nextOk:ok,nextLabel:label}),{title:L.in,color:"in"})}
+
+function doneScreen(kind){const L=t(),c=kind==="out"?"out":"in";
+ return frame(`<div class="done" style="--c:var(--${c})"><span class="ic">${I.check}</span><h1>${kind==="out"?L.outDone:L.inDone}</h1>
+  <ul>${(kind==="out"?L.outL:L.inL).map(x=>`<li>${I.tick}${x}</li>`).join("")}</ul></div><div class="spacer"></div>
+  <button class="big" data-act="home" style="--c:var(--${c})">${L.home}</button>`,{title:kind==="out"?L.out:L.in,color:c,back:false})}
+
+/* ---------- PLANNING : semaine + flotte ---------- */
+function planning(){const L=t(),cars=active(),own=S.role==="owner";
+ const head=`<span></span>${Array.from({length:7},(_,i)=>{const d=at(i,0);return`<span class="h ${i?"":"today"}">${L.d3[d.getDay()]}<br>${d.getDate()}</span>`}).join("")}`;
+ const rows=cars.map(c=>`<button class="rl" data-car="${c.id}">${esc(c.n)}<small dir="ltr">${esc(c.p)}</small></button>${Array.from({length:7},(_,i)=>`<i class="cell ${dayState(c,i)}" title="${L.legend[dayState(c,i)]}"></i>`).join("")}`).join("");
+ const q=S.f.q;let res="";
+ if(q){const free=cars.filter(c=>!blocked(c)&&[1,2].every(i=>dayState(c,i)==="free"));res=`<div class="okmsg">${I.tick}${L.nFree(free.length)}</div>${free.map(c=>`<div class="car-row"><span class="carico">${I.car}</span><div class="meta"><b>${c.n}</b><span dir="ltr">${c.p}</span></div></div>`).join("")}`}
+ return frame(`<h1>${L.planT}</h1><h2>${L.week}</h2>
+  <div class="legend">${["free","rented","booked","late"].map(k=>`<span><i class="cell ${k}" style="min-height:0"></i>${L.legend[k]}</span>`).join("")}</div>
+  <div class="tl">${head}${rows}</div>
+  <h2>${L.search}</h2><div class="seg" style="grid-auto-columns:1fr"><div class="field"><label for="q-a">${L.from}</label><input id="q-a" type="date" value="${iso(at(1,0))}"></div>
+  <div class="field"><label for="q-b">${L.to}</label><input id="q-b" type="date" value="${iso(at(3,0))}"></div></div>
+  <button class="big" data-act="search">${L.search}</button>${res}
+  <h2>${L.fleet(cars.length)}</h2>
+  ${own?`<button class="big" data-act="addcar">+ ${L.addCar}</button>`:`<p class="sub">${L.ownerOnly}</p>`}
+  ${cars.map(c=>`<div class="car-row"><div class="meta"><b>${esc(c.n)}</b><span dir="ltr">${esc(c.p)} · ${nf(c.km)} km</span></div>${own?`<button class="mini" data-editcar="${c.id}">${L.edit}</button>`:stChip(c)}</div>`).join("")}`,{title:L.plan,color:"plan"})}
+
+function carForm(){const L=t(),F=S.f,f=F.form,c=F.editId?S.cars.find(x=>x.id===F.editId):null;
+ const inp=(k,label,type,extra="")=>`<div class="field"><label for="ff-${k}">${label}</label><input id="ff-${k}" data-k="${k}" type="${type}" ${extra} value="${esc(f[k]??"")}"></div>`;
+ return frame(`<h1>${c?L.editCar:L.newCar}</h1>${inp("n",L.fModel,"text",'placeholder="Kia Picanto"')}${inp("p",L.fPlate,"text",'dir="ltr" placeholder="123 TU 4567"')}${inp("km",L.fKm,"number",'inputmode="numeric" dir="ltr"')}
+  <div class="field"><label>${L.fDash}</label><div class="seg">${[0,1,2].map(k=>`<button data-fdt="${k}" class="${f.dt===k?"sel":""}">${L.dashKinds[k]}</button>`).join("")}</div></div>
+  ${inp("oil",L.fOil,"number",'inputmode="numeric" dir="ltr"')}${inp("ins",L.fIns,"date")}${inp("vis",L.fVis,"date")}${inp("vig",L.fVig,"date")}
+  ${F.err?`<div class="badmsg">${L.need}</div>`:""}
+  <button class="big" data-act="savecar">${L.save}</button>
+  ${c?(F.ask?(c.st==="rented"||c.st==="late"?`<div class="badmsg">${L.cantRemove}</div>`
+    :`<div class="infobox"><b>${L.removeQ(esc(c.n))}</b><span>${L.removeL}</span></div><div class="yesno"><button class="big no" data-act="doremove">${L.yesRemove}</button><button class="big light" data-act="noremove">${L.cancel}</button></div>`)
+   :`<button class="big light" data-act="askremove" style="color:var(--bad)">${L.remove}</button>`):""}`,{title:L.plan,color:"plan"})}
+
+/* ---------- VOITURES : état de la flotte ---------- */
+function carsScreen(){const L=t(),cars=[...active()].sort((a,b)=>carLvl(b)-carLvl(a));
+ return frame(`<h1>${L.carsT}</h1><p class="sub">${L.sum(cars.length,cars.filter(c=>c.st==="free").length)}</p>
+  ${cars.map(c=>{const lv=carLvl(c),it=issueText(c);return`<button class="carcard lvl${lv}" data-car="${c.id}"><div class="cc-top"><b>${esc(c.n)}</b>${stChip(c)}</div>
+   <span dir="ltr" style="text-align:start">${esc(c.p)} · ${nf(c.km)} km</span>${it?`<span class="issue l${lv}">${it}</span>`:`<span class="okline">${I.tick}${L.allOk}</span>`}</button>`}).join("")}`,{title:L.cars,color:"cars"})}
+function carScreen(){const L=t(),c=S.cars.find(x=>x.id===S.carId),o=oilState(c),own=S.role==="owner",hist=S.log.filter(l=>l.car===c.id);
+ return frame(`<h1>${esc(c.n)}</h1><div class="cc-top"><span class="sub" dir="ltr">${esc(c.p)}</span>${stChip(c)}</div>
+  <div class="reading"><div><b dir="ltr">${nf(c.km)}</b><span>${L.kmNow}</span></div><div><b style="font-size:1.1rem">${L.dashKinds[c.dt]}</b><span>${L.dashT}</span></div></div>
+  <h2>${L.maintH}</h2>
+  <div class="car-row l${o.lvl}"><div class="meta"><b>${L.oilName}</b><span>${o.left<0?L.oilLate(nf(-o.left)):L.oilIn(nf(o.left))}</span></div>${S.f.oilOk?"":`<button class="mini" data-act="oil">${L.oilDone}</button>`}</div>
+  ${S.f.oilOk?`<div class="okmsg">${I.tick}${L.oilDoneOk}</div>`:""}
+  ${papers(c).map(p=>`<div class="car-row l${p.lvl}"><div class="meta"><b>${L[p.k]}</b><span>${p.lvl===2?L.paperBad+" · "+fmtD(p.d):p.lvl===1?L.paperSoon(p.n)+" · "+fmtD(p.d):L.paperOk(fmtD(p.d))}</span></div></div>`).join("")}
+  ${own?`<button class="big light" data-editcar="${c.id}">${L.edit}</button>`:""}
+  <h2>${L.histH}</h2>${hist.length?hist.map(logRow).join(""):`<p class="sub">${L.noHist}</p>`}`,{title:L.cars,color:"cars"})}
+
+/* ---------- ÉQUIPE (patron) ---------- */
+function team(){const L=t(),flt=S.f.flt||"all",people=S.staff.filter(p=>!p.gone);
+ const rows=S.log.filter(l=>flt==="all"||l.who===flt);
+ return frame(`<h1>${L.teamT}</h1><h2>${L.whoWhat}</h2>
+  ${people.map(p=>{const la=S.log.find(l=>l.who===p.id);return`<button class="carcard" data-staff="${p.id}"><div class="cc-top"><b><bdi>${esc(p.n)}</bdi></b><span class="mini" aria-hidden="true">${L.edit}</span></div>
+   <span dir="ltr" style="text-align:start">${esc(p.tel)}</span><div class="chips">${p.jobs.map(j=>`<span class="chip">${L.jobs[j]}</span>`).join("")}</div>
+   ${la?`<span>${L.lastAct} : ${L.logK[la.k]}${la.car?` · <bdi>${esc(carName(la.car))}</bdi>`:""} · ${dshort(la.at)}</span>`:""}</button>`}).join("")}
+  <button class="big" data-act="addstaff">+ ${L.addStaff}</button>
+  <h2>${L.journal}</h2><div class="filters">${[["all",L.all],...people.map(p=>[p.id,p.n.split(" ")[0]]),["mehdi","Mehdi"]].map(([id,n])=>`<button class="toggle ${flt===id?"sel":""}" data-flt="${id}">${esc(n)}</button>`).join("")}</div>
+  ${rows.length?rows.map(logRow).join(""):`<p class="sub">${L.noHist}</p>`}`,{title:L.teamTile,color:"team"})}
+function staffForm(){const L=t(),F=S.f,f=F.form,p=F.editId?S.staff.find(x=>x.id===F.editId):null;
+ return frame(`<h1>${p?L.editStaff:L.newStaff}</h1>
+  <div class="field"><label for="ff-n">${L.fName}</label><input id="ff-n" data-k="n" type="text" value="${esc(f.n||"")}"></div>
+  <div class="field"><label for="ff-tel">${L.fTel}</label><input id="ff-tel" data-k="tel" type="tel" dir="ltr" value="${esc(f.tel||"")}"></div>
+  <div class="field"><label>${L.fJobs}</label><div class="seg-wrap">${Object.keys(L.jobs).map(j=>`<button class="toggle ${f.jobs.includes(j)?"sel":""}" data-job="${j}">${f.jobs.includes(j)?"✓ ":""}${L.jobs[j]}</button>`).join("")}</div></div>
+  ${F.err?`<div class="badmsg">${L.needName}</div>`:""}
+  <button class="big" data-act="savestaff">${L.save}</button>
+  ${p?(F.ask?`<div class="infobox"><b>${L.removeQ(esc(p.n))}</b></div><div class="yesno"><button class="big no" data-act="dorstaff">${L.yesRemove}</button><button class="big light" data-act="noremove">${L.cancel}</button></div>`
+   :`<button class="big light" data-act="askremove" style="color:var(--bad)">${L.removeStaff}</button>`):""}`,{title:L.teamTile,color:"team"})}
+
+/* ---------- DEMANDES ---------- */
+function requests(){const L=t();const open=S.reqs.filter(r=>!r.done),closed=S.reqs.filter(r=>r.done);
+ const card=r=>`<div class="req-card" style="${r.done?"opacity:.7":""}"><div class="t">${r.kind==="book"?L.wantsBook(esc(r.n)):L.wantsMore(esc(r.n),r.days)}</div>
+  <div class="sub">${esc(r.car)}${r.kind==="book"?` · ${dshort(r.from)} → ${dshort(r.to)}`:""} · <span dir="ltr">${esc(r.tel)}</span></div>
+  ${r.kind==="book"&&r.docs?`<div class="okmsg">${I.tick}${L.docsSent}</div><button class="big light" data-docs="${r.id}">${r.open?L.hideDocs:L.seeDocs}</button>
+   ${r.open?`<div class="docs"><div class="doc">CIN · recto<br>(${S.lang==="ar"?"مثال":"exemple"})</div><div class="doc">CIN · verso</div><div class="doc">Permis</div></div>`:""}`:""}
+  ${!r.done&&r.kind==="book"?`<div class="field"><label for="rp-${r.id}">${L.perDay}</label><div class="money-in"><input id="rp-${r.id}" data-rp="${r.id}" type="number" inputmode="numeric" min="1" dir="ltr" placeholder="${L.typeIt}" value="${r.price||""}"><span>DT</span></div><b id="rpt-${r.id}" dir="ltr" ${r.price?"":"hidden"}>${rTotal(r)}</b></div>`:""}
+  ${r.done?`<div class="${r.done==="ok"?"okmsg":"badmsg"}">${r.done==="ok"?I.tick+(r.kind==="book"?`<span>${L.acceptedPrice(`<bdi dir="ltr">${rTotal(r)}</bdi>`)}</span>`:L.accepted):r.done==="booked"?L.bookedAfter:L.refused}</div>`
+   :`<div class="yesno"><button class="big" data-req="ok:${r.id}" style="--c:var(--out)" ${r.kind==="book"&&!r.price?"disabled":""}>✓ ${L.accept}</button><button class="big no" data-req="no:${r.id}">✗ ${L.refuse}</button></div>`}</div>`;
+ return frame(`<h1>${L.reqT}</h1>${open.length?open.map(card).join(""):`<div class="okmsg">${I.tick}${L.nothing}</div>`}${closed.map(card).join("")}`,{title:L.req,color:"req"})}
+
+/* ---------- ESPACE PATRON ---------- */
+function boss(){const L=t();const cars=[["Peugeot 208",82],["Dacia Logan",71],["Kia Picanto",67],["Hyundai Tucson",58],["Renault Clio",34]];
+ const issues=active().filter(c=>carLvl(c)>0).sort((a,b)=>carLvl(b)-carLvl(a));
+ return frame(`<h1>${L.bossT}</h1><span class="example">${S.lang==="ar"?"بيانات مثال":"Données d’exemple"} · ${L.month}</span>
+  <div class="kpis"><div class="kpi"><b dir="ltr">10 010 DT</b><span>${L.ca}</span></div><div class="kpi"><b>62 %</b><span>${L.occ}</span></div>
+   <div class="kpi"><b dir="ltr">1 240 DT</b><span>${L.repairs}</span></div><div class="kpi"><b dir="ltr">980 DT</b><span>${L.dep}</span></div></div>
+  <h2>${L.maint}</h2>${issues.length?issues.map(c=>`<button class="carcard lvl${carLvl(c)}" data-car="${c.id}"><b>${esc(c.n)}</b><span class="issue l${carLvl(c)}">${issueText(c)}</span></button>`).join(""):`<div class="okmsg">${I.tick}${L.allOk}</div>`}
+  <h2>${L.perCar}</h2>${cars.map(([n,o])=>`<div class="car-row"><div class="meta"><b>${n}</b><div class="bar"><i style="width:${o}%"></i></div></div><b>${o}%</b></div>`).join("")}`,{title:L.boss,color:"boss"})}
+
+/* ---------- rendu + actions ---------- */
+function render(){const L=t();document.documentElement.lang=S.lang;document.documentElement.dir=S.lang==="ar"?"rtl":"ltr";$("#note").innerHTML=L.note;
+ const v={home,out:outFlow,in:inFlow,plan:planning,req:requests,boss,cars:carsScreen,car:carScreen,carForm,team,staffForm,doneOut:()=>doneScreen("out"),doneIn:()=>doneScreen("in")}[S.screen];
+ $("#app").innerHTML=v();if(S.screen==="out"||S.screen==="in"){runFilm();bindInputs()}
+ document.querySelectorAll("[data-k]").forEach(e=>{e.oninput=()=>{S.f.form[e.dataset.k]=e.value}})}
+document.addEventListener("input",e=>{const id=e.target.dataset&&e.target.dataset.rp;if(!id)return;const r=S.reqs.find(x=>x.id===+id),v=parseInt(e.target.value,10);r.price=v>0?v:0;
+ const tot=$("#rpt-"+id);tot.hidden=!r.price;tot.textContent=rTotal(r);const b=document.querySelector(`[data-req="ok:${id}"]`);if(b)b.disabled=!r.price});
+const rDays=r=>Math.max(1,Math.round((r.to-r.from)/DAY));const rTotal=r=>`${rDays(r)} × ${r.price||0} = ${rDays(r)*(r.price||0)} DT`;
+function go(sc){S.stack=[...(S.stack||[]),S.screen];S.screen=sc;render();window.scrollTo({top:0})}
+function back(){S.screen=(S.stack||[]).pop()||"home";render();window.scrollTo({top:0})}
+function start(flow){clearInterval(filmTimer);S.screen=flow;S.step=0;
+ S.f=flow==="out"?{cl:"fr",dmgs:[{kind:"dent",label:{fr:"Bosse · capot",ar:"انبعاج · غطاء المحرّك"}},{kind:"scratch",label:{fr:"Rayure · pare-choc arrière",ar:"خدش · الصدّام الخلفي"}},{kind:"reflect",label:{fr:"Rayure · porte arrière gauche",ar:"خدش · الباب الخلفي الأيسر"}}]}
+  :flow==="in"?{dmgs:[{kind:"scratch",label:{fr:"Rayure · porte avant droite",ar:"خدش · الباب الأمامي الأيمن"}}]}:{};render();window.scrollTo({top:0})}
+function bindInputs(){const F=S.f;const on=(id,fn)=>{const e=$(id);if(e)e.oninput=()=>{fn(e.value);const b=document.querySelector('[data-act="next"]');
+  if(b&&S.screen==="out"){const k=OUT_STEPS[S.step];if(k==="client")b.disabled=!(F.name&&F.tel)}}};
+ on("#f-n",v=>F.name=v);on("#f-t",v=>F.tel=v);
+ const nx=ok=>{const b=document.querySelector('[data-act="next"]');if(b)b.disabled=!ok};
+ const km=$("#f-km");if(km)km.oninput=()=>{const v=parseInt(km.value,10);if(v>=0)F.km=v;const c=S.cars.find(x=>x.id===F.car);$("#kmlow").hidden=!(F.km<c.km)};
+ const pr=$("#f-price");if(pr)pr.oninput=()=>{const v=parseInt(pr.value,10);F.price=v>0?v:0;const n=F.days||3,box=$("#price-total");box.hidden=!F.price;
+  box.innerHTML=`<span>${t().total} <b dir="ltr">${n} × ${F.price} = ${n*F.price} DT</b></span>`;nx(F.price>0)};
+ const dp=$("#f-dep");if(dp)dp.oninput=()=>{const v=parseInt(dp.value,10);F.dep=dp.value===""||isNaN(v)?null:Math.max(0,v);nx(F.dep!=null)};
+ const l=$("#f-l");if(l)l.onchange=()=>{F.lic=l.value;render()};
+ const dm=$("#f-dmg");if(dm)dm.onchange=()=>{F.dmgCost=Math.max(0,+dm.value||0);render()}}
+document.addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;const F=S.f;const L=t();
+ if(b.dataset.go){S.stack=[...(S.stack||[]),S.screen];if(["out","in"].includes(b.dataset.go))start(b.dataset.go);else{S.screen=b.dataset.go;S.f={};render();window.scrollTo({top:0})}return}
+ if(b.dataset.car){S.carId=b.dataset.car;S.f={};go("car");return}
+ if(b.dataset.editcar){const c=S.cars.find(x=>x.id===b.dataset.editcar);S.f={form:{n:c.n,p:c.p,km:c.km,dt:c.dt,oil:c.oil,ins:c.ins,vis:c.vis,vig:c.vig},editId:c.id};go("carForm");return}
+ if(b.dataset.fdt){F.form.dt=+b.dataset.fdt;render();return}
+ if(b.dataset.staff){const p=S.staff.find(x=>x.id===b.dataset.staff);S.f={form:{n:p.n,tel:p.tel,jobs:[...p.jobs]},editId:p.id};go("staffForm");return}
+ if(b.dataset.job){const j=F.form.jobs,k=b.dataset.job;F.form.jobs=j.includes(k)?j.filter(x=>x!==k):[...j,k];render();return}
+ if(b.dataset.flt){F.flt=b.dataset.flt;render();return}
+ const a=b.dataset.act;
+ if(a==="lang"){S.lang=S.lang==="fr"?"ar":"fr";try{localStorage.setItem("cc-lang",S.lang)}catch(_){}render();return}
+ if(a==="role"){S.role=S.role==="owner"?"staff":"owner";render();return}
+ if(a==="home"){S.screen="home";S.stack=[];render();return}
+ if(a==="addcar"){S.f={form:{dt:0}};go("carForm");return}
+ if(a==="savecar"){const f=F.form,km=parseInt(f.km,10);if(!(f.n||"").trim()||!(f.p||"").trim()||!(km>=0)){F.err=true;render();return}
+  const data={n:f.n.trim(),p:f.p.trim().toUpperCase(),km,dt:f.dt||0,oil:parseInt(f.oil,10)||km+10000,ins:f.ins||"",vis:f.vis||"",vig:f.vig||""};
+  if(F.editId){Object.assign(S.cars.find(x=>x.id===F.editId),data);log("edit",F.editId)}else{const id="c"+Date.now();S.cars.push({id,st:"free",...data});log("add",id)}
+  back();return}
+ if(a==="askremove"){F.ask=true;render();return}
+ if(a==="noremove"){F.ask=false;render();return}
+ if(a==="doremove"){const c=S.cars.find(x=>x.id===F.editId);c.gone=true;log("remove",c.id);S.stack=["home"];S.screen="plan";S.f={};render();return}
+ if(a==="oil"){const c=S.cars.find(x=>x.id===S.carId);c.oil=c.km+10000;S.f.oilOk=true;log("oil",c.id);render();return}
+ if(a==="addstaff"){S.f={form:{n:"",tel:"",jobs:[]}};go("staffForm");return}
+ if(a==="savestaff"){const f=F.form;if(!(f.n||"").trim()){F.err=true;render();return}
+  if(F.editId)Object.assign(S.staff.find(x=>x.id===F.editId),{n:f.n.trim(),tel:f.tel||"",jobs:f.jobs});else{S.staff.push({id:"s"+Date.now(),n:f.n.trim(),tel:f.tel||"",jobs:f.jobs});log("staff",null,f.n.trim())}
+  back();return}
+ if(a==="dorstaff"){S.staff.find(x=>x.id===F.editId).gone=true;back();return}
+ if(a==="back"){clearInterval(filmTimer);if((S.screen==="out"||S.screen==="in")&&S.step>0){S.step--;render()}else back();return}
+ if(a==="next"){clearInterval(filmTimer);const steps=S.screen==="out"?OUT_STEPS:IN_STEPS;
+  if(S.step<steps.length-1){S.step++;render();window.scrollTo({top:0})}
+  else{const c=S.cars.find(x=>x.id===F.car);if(S.screen==="out"){c.st="rented";c.ret=new Date(now.getTime()+(F.days||3)*DAY);c.client=F.name;c.km=F.km;delete c.start;log("out",c.id,F.name);S.screen="doneOut"}
+   else{c.km=F.km;log("in",c.id,c.client);c.st="free";delete c.client;S.screen="doneIn"}render();window.scrollTo({top:0})}return}
+ if(b.dataset.pick){F.car=b.dataset.pick;const c=S.cars.find(x=>x.id===F.car);
+  if(S.screen==="out"){if(c.st==="booked"){F.name=c.client;F.tel=c.tel;F.lic=c.lic}else{F.name="";F.tel="";F.lic=""}F.km=c.km;F.e8=8;F.price=null;F.dep=null}
+  else{F.km=c.km+(c.id==="dacia"?1180:640);F.out8=6;F.e8=3;F.dep=300}render();return}
+ if(b.dataset.cl){F.cl=b.dataset.cl;render();return}
+ if(a==="licphoto"){F.licPhoto=true;render();return}
+ if(a==="startfilm"){F.rec=true;F.t=0;render();return}
+ if(a==="stopfilm"){if(F.t>=45){clearInterval(filmTimer);F.film=true;render()}return}
+ if(a==="refilm"){F.film=false;F.rec=false;render();return}
+ if(a==="dashshot"){F.dashShot=true;render();return}
+ if(a==="dashok"){F.dashOk=true;F.fixing=false;render();return}
+ if(a==="dashfix"){F.fixing=true;F.dashOk=false;render();return}
+ if(b.dataset.e8){F.e8=+b.dataset.e8;render();return}
+ if(b.dataset.ans){const d=F.dmgs.find(x=>!x.ans);if(d)d.ans=b.dataset.ans;render();return}
+ if(a==="minus"||a==="plus"){F.days=Math.max(1,Math.min(60,(F.days||3)+(a==="plus"?1:-1)));render();return}
+ if(b.dataset.pay){F.pay=b.dataset.pay;render();return}
+ if(a==="search"){S.f.q={a:at(1,0)};render();return}
+ if(b.dataset.docs){const r=S.reqs.find(x=>x.id===+b.dataset.docs);r.open=!r.open;render();return}
+ if(b.dataset.req){const[w,id]=b.dataset.req.split(":"),r=S.reqs.find(x=>x.id===+id);if(w==="ok"&&r.kind==="book"&&!r.price)return;r.done=w==="ok"?(r.booked?"booked":"ok"):"no";
+  if(r.done==="ok"){const c=S.cars.find(x=>x.n===r.car);if(r.kind==="book"){c.books=(c.books||[]).concat([{a:r.from,b:r.to}]);log("book",c.id,r.n)}
+   else{c.ret=new Date(c.ret.getTime()+r.days*DAY);if(c.st==="late"&&c.ret>now)c.st="rented";log("more",c.id,r.n)}}render();return}
+});
+render();
+</script>
+
+</body></html>

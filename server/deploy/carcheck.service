@@ -1,0 +1,12 @@
+[Unit]
+Description=AI Car Check
+After=network.target
+
+[Service]
+User=carcheck
+WorkingDirectory=/opt/carcheck/app
+ExecStart=/opt/carcheck/venv/bin/uvicorn carcheck.app:app --host 127.0.0.1 --port 8000
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

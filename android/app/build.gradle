@@ -1,0 +1,35 @@
+plugins { id 'com.android.application' }
+
+// Sur GitHub, chaque fabrication a un numéro : il devient le numéro de version de l'APK.
+def runNumber = Integer.parseInt(System.getenv('GITHUB_RUN_NUMBER') ?: '1')
+
+android {
+    namespace 'tn.carcheck.app'
+    compileSdk 34
+    defaultConfig {
+        applicationId 'tn.carcheck.app'
+        minSdk 24
+        targetSdk 34
+        // +1000 : toujours plus grand que les anciennes versions, même dans un nouveau dépôt
+        versionCode 1000 + runNumber
+        versionName "2.${runNumber}"
+    }
+    signingConfigs {
+        // Clé de test fixe : chaque nouvel APK s'installe par-dessus le précédent.
+        // Pour le Play Store, créez une vraie clé de publication (ne la mettez jamais sur GitHub).
+        debug {
+            storeFile file('debug.keystore')
+            storePassword 'android'
+            keyAlias 'androiddebugkey'
+            keyPassword 'android'
+        }
+    }
+    buildTypes {
+        debug { signingConfig signingConfigs.debug }
+        release { minifyEnabled false }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}

@@ -1,0 +1,4 @@
+# crontab -e  (as user carcheck)
+0 8 1 * *  cd /opt/carcheck/app && /opt/carcheck/venv/bin/python -m carcheck.monthly
+30 3 * * * cd /opt/carcheck/app && /opt/carcheck/venv/bin/python -m carcheck.cleanup
+*/15 * * * * cd /opt/carcheck/app && /opt/carcheck/venv/bin/python -m carcheck.reminders

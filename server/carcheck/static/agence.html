@@ -1,0 +1,840 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<title>Car Check Agence</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: une colonne « téléphone », un écran = une action, gros boutons colorés par action */
+:root{
+  --bg:#eef1f4; --app:#f8fafb; --card:#ffffff; --ink:#15202b; --mute:#5c6875; --line:#d8dee4;
+  --out:#2b8a3e; --out-soft:#e3f4e6; --in:#1c6fd1; --in-soft:#e2eefb; --plan:#c77700; --plan-soft:#fdf0d8;
+  --req:#7048c8; --req-soft:#efe9fb; --boss:#25303b; --boss-soft:#e6e9ed; --bad:#d6336c; --bad-soft:#fde4ec; --cars:#0f7c74; --cars-soft:#dff2ef; --team:#8d5b3a; --team-soft:#f5ebe3;
+  --font:"IBM Plex Sans","IBM Plex Sans Arabic",system-ui,sans-serif;
+  --font-ar:"IBM Plex Sans Arabic","IBM Plex Sans",Tahoma,system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0d1217; --app:#121921; --card:#19222c; --ink:#e8edf2; --mute:#98a4b0; --line:#2b3642;
+  --out:#51c26a; --out-soft:#173222; --in:#5aa2f0; --in-soft:#14263b; --plan:#f0a53a; --plan-soft:#33270f;
+  --req:#a68af0; --req-soft:#251d3d; --boss:#c5ced8; --boss-soft:#222c37; --bad:#f06595; --bad-soft:#3b1828; --cars:#3cc2b5; --cars-soft:#123331; --team:#d9a07a; --team-soft:#33241a; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0d1217; --app:#121921; --card:#19222c; --ink:#e8edf2; --mute:#98a4b0; --line:#2b3642;
+  --out:#51c26a; --out-soft:#173222; --in:#5aa2f0; --in-soft:#14263b; --plan:#f0a53a; --plan-soft:#33270f;
+  --req:#a68af0; --req-soft:#251d3d; --boss:#c5ced8; --boss-soft:#222c37; --bad:#f06595; --bad-soft:#3b1828; --cars:#3cc2b5; --cars-soft:#123331; --team:#d9a07a; --team-soft:#33241a; color-scheme:dark}
+*{box-sizing:border-box}
+html,body{min-height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:17px;line-height:1.45;
+  padding-left:max(0px,env(safe-area-inset-left,0px));padding-right:max(0px,env(safe-area-inset-right,0px))}
+[dir="rtl"] body,[dir="rtl"]{font-family:var(--font-ar)}
+.note{max-width:430px;margin:0 auto;padding:12px 16px 0;color:var(--mute);font-size:.85rem}
+.note b{color:var(--ink)}
+.app{max-width:430px;margin:12px auto 28px;background:var(--app);min-height:760px;border:1px solid var(--line);border-radius:26px;overflow:hidden;
+  display:flex;flex-direction:column;box-shadow:0 12px 40px rgba(20,30,40,.08)}
+@media (max-width:460px){.app{margin:0;border-radius:0;border-left:0;border-right:0;min-height:100vh}.note{padding-top:8px}}
+.top{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--line);background:var(--card)}
+.top .who{flex:1;min-width:0}.top .who b{display:block;font-size:1rem}.top .who span{font-size:.8rem;color:var(--mute)}
+.pill-btn{border:1px solid var(--line);background:var(--app);color:var(--ink);border-radius:99px;padding:8px 14px;font:inherit;font-size:.9rem;font-weight:600;cursor:pointer;min-height:40px}
+.iconbtn{width:44px;height:44px;border-radius:12px;border:1px solid var(--line);background:var(--app);color:var(--ink);display:grid;place-items:center;cursor:pointer;flex:none}
+[dir="rtl"] .iconbtn svg.flip{transform:scaleX(-1)}
+main{flex:1;padding:18px 16px 24px;display:flex;flex-direction:column;gap:14px}
+h1{font-size:1.55rem;line-height:1.2;margin:0;text-wrap:balance}
+h2{font-size:1.1rem;margin:4px 0 0}
+.sub{color:var(--mute);margin:0;font-size:.95rem}
+button{font-family:inherit}
+:focus-visible{outline:3px solid var(--plan);outline-offset:2px}
+/* accueil */
+.alerts{display:grid;gap:8px}
+.alert{display:flex;align-items:center;gap:12px;border-radius:14px;padding:12px 14px;background:var(--card);border:1px solid var(--line);font-weight:600;text-align:start;cursor:pointer;color:var(--ink);width:100%;font-size:1rem}
+.alert .dot{width:12px;height:12px;border-radius:50%;flex:none}
+.alert.bad{border-color:var(--bad);background:var(--bad-soft)}.alert.bad .dot{background:var(--bad)}
+.alert.req .dot{background:var(--req)}.alert.in .dot{background:var(--in)}
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.tile{position:relative;border:0;border-radius:20px;padding:18px 14px;min-height:150px;display:flex;flex-direction:column;justify-content:space-between;align-items:flex-start;
+  text-align:start;cursor:pointer;color:var(--ink);font-size:1.25rem;font-weight:700;line-height:1.2}
+.tile small{display:block;font-size:.82rem;font-weight:500;color:var(--mute);margin-top:4px}
+.tile .ic{width:58px;height:58px;border-radius:16px;display:grid;place-items:center;color:#fff}
+.tile.out{background:var(--out-soft)}.tile.out .ic{background:var(--out)}
+.tile.in{background:var(--in-soft)}.tile.in .ic{background:var(--in)}
+.tile.plan{background:var(--plan-soft)}.tile.plan .ic{background:var(--plan)}
+.tile.req{background:var(--req-soft)}.tile.req .ic{background:var(--req)}
+.tile.boss{grid-column:1/-1;min-height:auto;flex-direction:row;align-items:center;gap:14px;background:var(--boss-soft)}.tile.boss .ic{background:var(--boss);color:var(--app)}
+.tile.cars{background:var(--cars-soft)}.tile.cars .ic{background:var(--cars)}.tile.team{background:var(--team-soft)}.tile.team .ic{background:var(--team)}
+.tile.wide{grid-column:1/-1;min-height:auto;flex-direction:row;align-items:center;gap:14px}
+.alert.plan .dot{background:var(--plan)}
+.choice:disabled{opacity:.6;cursor:not-allowed}
+.cc-top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.tl{display:grid;grid-template-columns:minmax(0,1.6fr) repeat(7,minmax(0,1fr));gap:3px;align-items:stretch}
+.tl .h{font-size:.64rem;text-align:center;color:var(--mute);font-weight:600;line-height:1.15;padding-bottom:2px}.tl .h.today{color:var(--ink);font-weight:800}
+.tl .rl{border:0;background:none;text-align:start;padding:2px 0;color:var(--ink);font:inherit;font-size:.8rem;font-weight:700;cursor:pointer;min-width:0;overflow:hidden;line-height:1.15}
+.tl .rl small{display:block;font-weight:500;color:var(--mute);font-size:.66rem;white-space:nowrap}
+.cell{border-radius:6px;min-height:36px}.cell.free{background:var(--out-soft)}.cell.rented{background:var(--in)}.cell.booked{background:var(--plan)}.cell.late{background:var(--bad)}
+.legend{display:flex;flex-wrap:wrap;gap:12px;font-size:.85rem;font-weight:600}.legend span{display:flex;align-items:center;gap:6px}.legend i{width:16px;height:16px;border-radius:4px}
+.carcard{display:grid;gap:6px;width:100%;text-align:start;border:2px solid var(--line);background:var(--card);border-radius:16px;padding:14px;cursor:pointer;color:var(--ink);font-size:1rem}
+.carcard>span{color:var(--mute);font-size:.9rem}.carcard.lvl1{border-color:var(--plan)}.carcard.lvl2{border-color:var(--bad)}
+.issue{font-weight:700;font-size:.92rem}.issue.l1{color:var(--plan)}.issue.l2{color:var(--bad)}
+.okline{display:flex;gap:8px;align-items:center;color:var(--out)!important;font-weight:600}
+.car-row.l1{border-color:var(--plan);background:var(--plan-soft)}.car-row.l2{border-color:var(--bad);background:var(--bad-soft)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}.chip{border-radius:99px;padding:4px 10px;font-size:.82rem;font-weight:600;background:var(--team-soft);color:var(--ink)}
+.mini{border:1px solid var(--line);background:var(--app);color:var(--ink);border-radius:10px;padding:6px 12px;font:inherit;font-size:.88rem;font-weight:600;cursor:pointer;min-height:40px;white-space:nowrap}
+.seg-wrap,.filters{display:flex;flex-wrap:wrap;gap:8px}
+.toggle{border:2px solid var(--line);background:var(--card);border-radius:14px;min-height:50px;padding:0 16px;font:inherit;font-size:1rem;font-weight:600;color:var(--ink);cursor:pointer}
+.toggle.sel{border-color:var(--c,var(--team));background:color-mix(in srgb,var(--c,var(--team)) 14%,var(--card))}
+.filters .toggle{min-height:42px;padding:0 12px;font-size:.92rem}
+.logrow{display:grid;grid-template-columns:auto minmax(0,1fr);gap:2px 12px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 14px}
+.logrow .when{grid-row:span 2;font-size:.8rem;color:var(--mute);font-weight:600;width:82px}.logrow span:last-child{font-size:.9rem;color:var(--mute)}
+.badge{position:absolute;top:12px;inset-inline-end:12px;min-width:30px;height:30px;border-radius:99px;background:var(--bad);color:#fff;font-size:1rem;display:grid;place-items:center;padding:0 8px}
+/* assistant */
+.prog{display:flex;gap:5px}.prog i{flex:1;height:7px;border-radius:4px;background:var(--line)}.prog i.on{background:var(--c,var(--out))}
+.stepno{font-size:.85rem;color:var(--mute);font-weight:600}
+.choice{display:flex;align-items:center;gap:14px;width:100%;border:2px solid var(--line);background:var(--card);border-radius:16px;padding:14px;cursor:pointer;text-align:start;color:var(--ink);font-size:1.05rem}
+.choice b{display:block}.choice span{color:var(--mute);font-size:.88rem}
+.choice.sel{border-color:var(--c,var(--out));box-shadow:0 0 0 3px color-mix(in srgb,var(--c,var(--out)) 25%,transparent)}
+.choice .carico{width:48px;height:48px;border-radius:12px;background:var(--app);display:grid;place-items:center;flex:none;color:var(--mute)}
+.choice.late{border-color:var(--bad);background:var(--bad-soft)}
+.group{font-size:.82rem;font-weight:700;color:var(--mute);text-transform:uppercase;letter-spacing:.06em;margin-top:6px}
+[dir="rtl"] .group{letter-spacing:0}
+.field{display:grid;gap:6px}.field label{font-weight:600;font-size:.95rem}
+input[type=text],input[type=tel],input[type=date],input[type=number]{width:100%;font:inherit;font-size:1.1rem;padding:14px;border-radius:14px;border:2px solid var(--line);background:var(--card);color:var(--ink);min-height:56px}
+.seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:8px}
+.seg button{border:2px solid var(--line);background:var(--card);border-radius:14px;min-height:56px;font-size:1.05rem;font-weight:600;color:var(--ink);cursor:pointer}
+.seg button.sel{border-color:var(--c,var(--out));background:color-mix(in srgb,var(--c,var(--out)) 14%,var(--card))}
+.big{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;min-height:64px;border:0;border-radius:18px;font-size:1.2rem;font-weight:700;cursor:pointer;color:#fff;background:var(--c,var(--out))}
+.big:disabled{opacity:.4;cursor:not-allowed}
+.big.light{background:var(--card);color:var(--ink);border:2px solid var(--line)}
+.big.no{background:var(--bad)}
+.yesno{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.spacer{flex:1}
+.footer{position:sticky;bottom:0;padding-top:8px;background:linear-gradient(transparent,var(--app) 30%)}
+.okmsg{display:flex;gap:10px;align-items:center;font-weight:600;color:var(--out)}
+.badmsg{border-radius:14px;padding:12px 14px;background:var(--bad-soft);color:var(--bad);font-weight:600}
+.infobox{border-radius:14px;padding:12px 14px;background:var(--card);border:1px solid var(--line);display:grid;gap:4px}
+.photo{width:100%;aspect-ratio:16/10;border-radius:16px;overflow:hidden;background:#20262d;display:block}
+.photo svg{width:100%;height:100%;display:block}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:8px}.pair figure{margin:0;display:grid;gap:4px}.pair figcaption{font-size:.85rem;color:var(--mute);font-weight:600}
+.cam{display:grid;place-items:center;gap:10px;border:3px dashed var(--line);border-radius:20px;padding:28px 16px;background:var(--card);cursor:pointer;color:var(--ink);font-size:1.15rem;font-weight:700;width:100%}
+.cam .ic{width:70px;height:70px;border-radius:50%;background:var(--c,var(--out));color:#fff;display:grid;place-items:center}
+/* viseur : toujours sombre */
+.viewfinder{position:relative;border-radius:18px;overflow:hidden;background:linear-gradient(160deg,#2c333a,#121519);color:#fff;min-height:330px;display:grid;grid-template-rows:auto 1fr auto}
+.vf-top{background:rgba(0,0,0,.55);padding:12px 14px;display:grid;gap:2px}.vf-top b{font-size:1.25rem}
+.vf-arrow{display:grid;place-items:center;font-size:5.5rem;color:#f2b705;text-shadow:0 0 14px #000;line-height:1}
+.vf-bot{background:rgba(0,0,0,.55);padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.vf-time{font-size:1.6rem;font-variant-numeric:tabular-nums;font-weight:700}
+.vf-dots{display:flex;gap:5px}.vf-dots i{width:20px;height:5px;border-radius:3px;background:rgba(255,255,255,.3)}.vf-dots i.on{background:#f2b705}
+.vf-btn{border:0;border-radius:14px;padding:12px 16px;font-size:1rem;font-weight:700;background:#d6336c;color:#fff;cursor:pointer;min-height:52px}
+.vf-btn:disabled{opacity:.55}
+.reading{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.reading div{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;text-align:center}
+.reading b{display:block;font-size:1.6rem;font-variant-numeric:tabular-nums}.reading span{color:var(--mute);font-size:.9rem}
+.gauge{display:grid;grid-template-columns:repeat(8,1fr);gap:5px;direction:ltr;align-items:end}
+.gauge i{display:block;height:34px;border-radius:6px;background:var(--line)}
+.gauge i.on{background:var(--c,var(--out))}
+.gauge.tap button{height:58px;border-radius:10px;border:2px solid var(--line);background:var(--card);cursor:pointer;padding:0}
+.gauge.tap button.on{background:var(--c,var(--out));border-color:var(--c,var(--out))}
+.gauge-ends{display:flex;justify-content:space-between;direction:ltr;color:var(--mute);font-weight:700;font-size:.9rem}
+.dtype{align-self:flex-start;border-radius:99px;padding:4px 12px;background:var(--card);border:1px solid var(--line);font-weight:600;font-size:.9rem}
+.money-in{display:flex;align-items:center;gap:10px}.money-in input{font-size:2rem;font-weight:700;text-align:center}.money-in span{font-size:1.4rem;font-weight:700}
+.examples{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.examples figure{margin:0;text-align:center;font-size:.78rem;color:var(--mute)}.examples svg{width:100%;border-radius:8px;display:block}
+.stepper{display:grid;grid-template-columns:72px 1fr 72px;gap:10px;align-items:center}
+.stepper button{height:72px;border-radius:18px;border:2px solid var(--line);background:var(--card);font-size:2rem;font-weight:700;color:var(--ink);cursor:pointer}
+.stepper output{text-align:center;font-size:2.6rem;font-weight:700;font-variant-numeric:tabular-nums}
+.stepper output small{display:block;font-size:1rem;color:var(--mute);font-weight:600}
+.money{display:grid;gap:8px}
+.mrow{display:flex;justify-content:space-between;gap:12px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;font-size:1.05rem}
+.mrow b{font-variant-numeric:tabular-nums;white-space:nowrap}
+.mrow.total{border:3px solid var(--out);background:var(--out-soft);font-size:1.2rem}.mrow.total b{font-size:1.5rem}
+.mrow input{width:120px;min-height:48px;padding:8px 10px;text-align:center}
+.done{display:grid;place-items:center;text-align:center;gap:14px;padding:20px 0}
+.done .ic{width:110px;height:110px;border-radius:50%;background:var(--c,var(--out));color:#fff;display:grid;place-items:center}
+.done ul{list-style:none;padding:0;margin:0;display:grid;gap:8px;text-align:start}
+.done li{display:flex;gap:10px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 14px}
+/* planning */
+.car-row{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px 14px}
+.car-row .meta{flex:1;min-width:0}.car-row b{display:block}.car-row span{color:var(--mute);font-size:.9rem}
+.st{border-radius:99px;padding:6px 12px;font-weight:700;font-size:.85rem;white-space:nowrap}
+.st.free{background:var(--out-soft);color:var(--out)}.st.rented{background:var(--in-soft);color:var(--in)}
+.st.booked{background:var(--plan-soft);color:var(--plan)}.st.late{background:var(--bad);color:#fff}
+.req-card{background:var(--card);border:2px solid var(--line);border-radius:18px;padding:14px;display:grid;gap:10px}
+.req-card .t{font-size:1.1rem;font-weight:700}
+.docs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.doc{aspect-ratio:1.58;border-radius:10px;background:var(--app);border:1px solid var(--line);display:grid;place-items:center;font-size:.72rem;color:var(--mute);text-align:center;padding:4px}
+.kpis{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px}
+.kpi b{display:block;font-size:1.5rem;font-variant-numeric:tabular-nums}.kpi span{color:var(--mute);font-size:.88rem}
+.bar{height:10px;border-radius:5px;background:var(--line);overflow:hidden}.bar i{display:block;height:100%;background:var(--in)}
+.example{align-self:flex-start;font-size:.75rem;color:var(--mute);border:1px solid var(--line);border-radius:99px;padding:2px 10px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+/* --- application réelle --- */
+.app{min-height:100vh}
+@media (min-width:461px){.app{min-height:760px}}
+.banner{margin:0;padding:8px 16px;font-size:.88rem;font-weight:600;background:var(--plan-soft);color:var(--ink);border-bottom:1px solid var(--line)}
+.banner.bad{background:var(--bad-soft);color:var(--bad)}
+.toast{position:sticky;bottom:12px;margin:0 16px 12px;padding:12px 14px;border-radius:14px;background:var(--ink);color:var(--app);font-weight:600;z-index:5}
+.spin{width:54px;height:54px;border-radius:50%;border:6px solid var(--line);border-top-color:var(--c,var(--out));animation:sp 1s linear infinite;margin:10px auto}
+@keyframes sp{to{transform:rotate(360deg)}}
+.center{text-align:center;display:grid;gap:10px;justify-items:center}
+.thumb{width:100%;max-height:260px;object-fit:contain;border-radius:16px;background:#20262d;display:block}
+.photo img{width:100%;height:100%;object-fit:cover;display:block}
+.pair .photo{aspect-ratio:4/3}
+.muted-box{border-radius:14px;padding:12px 14px;background:var(--card);border:1px dashed var(--line);color:var(--mute)}
+.cell.pending{background:repeating-linear-gradient(45deg,var(--plan-soft),var(--plan-soft) 4px,color-mix(in srgb,var(--plan) 35%,var(--card)) 4px,color-mix(in srgb,var(--plan) 35%,var(--card)) 8px)}
+.docs img{width:100%;aspect-ratio:1.58;object-fit:cover;border-radius:10px;border:1px solid var(--line);background:var(--app);display:block}
+.linkrow{display:flex;flex-wrap:wrap;gap:8px}
+.linkrow a,.linkrow button{color:var(--ink)}
+.todo-row{display:flex;align-items:center;gap:12px;width:100%;border-radius:14px;padding:12px 14px;background:var(--card);border:2px solid var(--c,var(--line));font-weight:600;text-align:start;cursor:pointer;color:var(--ink);font-size:1rem}
+.todo-row .dot{width:12px;height:12px;border-radius:50%;background:var(--c,var(--mute));flex:none}
+.todo-row small{display:block;font-weight:500;color:var(--mute)}
+input[type=password]{width:100%;font:inherit;font-size:1.1rem;padding:14px;border-radius:14px;border:2px solid var(--line);background:var(--card);color:var(--ink);min-height:56px}
+.hidden-input{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
+.kpi small{display:block;color:var(--mute);font-size:.8rem}
+[hidden]{display:none!important}
+.tile.wide,.tile.boss{justify-content:flex-start}
+</style></head>
+<body><div class="app" id="app" aria-live="polite"></div>
+<script>
+/* ---------- textes : français / arabe ---------- */
+const T={
+fr:{lang:"عربي",hello:"Bonjour",staff:"Employé",owner:"Patron",asOwner:"Voir comme patron",asStaff:"Voir comme employé",
+ note:"<b>Maquette</b> · données d’exemple. Testez en français et en arabe, et comme employé ou patron.",
+ late:n=>n>1?`${n} voitures en retard`:`${n} voiture en retard`,retToday:n=>n>1?`${n} retours prévus aujourd’hui`:`${n} retour prévu aujourd’hui`,reqs:n=>n>1?`${n} demandes à traiter`:`${n} demande à traiter`,
+ out:"Sortie",outS:"Donner une voiture",in:"Retour",inS:"Reprendre une voiture",plan:"Planning",planS:"Libres et louées",req:"Demandes",reqS:"Réservations, prolongations",
+ boss:"Espace patron",bossS:"Argent, voitures, équipe",next:"Suivant",back:"Précédent",home:"Accueil",step:(a,b)=>`Étape ${a} sur ${b}`,
+ qCarOut:"Quelle voiture sort ?",bookedToday:"Réservée aujourd’hui",free:"Libres",
+ qClient:"Qui loue la voiture ?",name:"Nom du client",phone:"WhatsApp du client",msgLang:"Langue des messages au client",fromBooking:"Rempli depuis la réservation ✓",
+ qLic:"Le permis du client",licUntil:"Permis valable jusqu’au",licPhoto:"Photo du permis",licDone:"Photo prise ✓",licChecked:"Déjà vérifié à la réservation ✓",licBad:"Permis expiré : pas de location",
+ qFilm:"Filmez le tour de la voiture",filmHint:"Tenez le téléphone couché. Suivez la flèche.",filmStart:"Commencer à filmer",filmStop:"Terminer",filmLeft:s=>`Encore ${s} s`,filmOk:"Vidéo prête ✓",filmAgain:"Refilmer",
+ sides:["AVANT","CÔTÉ DROIT","ARRIÈRE","CÔTÉ GAUCHE","INTÉRIEUR"],sideHints:["Pare-choc, capot, plaque","Portes et roues","Coffre et plaque","Portes et roues","Sièges et compteur"],
+ qDash:"Photo du compteur",dashHint:"Mettez le contact. Le total des km et l’essence doivent se voir.",dashOdo:"Vous voyez seulement TRIP ? Appuyez sur le bouton du compteur jusqu’au total (ODO).",dashKinds:["À aiguilles","Numérique","Écran"],takePhoto:"Prendre la photo",read:"Lu automatiquement",km:"Kilomètres (total)",fuel:"Essence",right:"C’est juste",fix:"Corriger",tapFuel:"Touchez le niveau d’essence",empty:"Vide",full:"Plein",kmLow:k=>`Plus petit que la dernière fois (${k} km). Vérifiez.`,
+ qDmg:"Ces dégâts sont-ils vrais ?",dmgOf:(a,b)=>`${a} sur ${b}`,isDmg:"Est-ce bien un dégât ?",yes:"Oui",no:"Non",noDmg:"Aucun dégât trouvé ✓",
+ qDays:"Combien de jours ?",days:"jours",backOn:"Retour le",price:"Prix",perDay:"Prix par jour",total:"Total",typeIt:"Tapez le montant",
+ qDep:"La caution",depAmount:"Montant de la caution",depHow:"Payée comment ?",cash:"Espèces",card:"Carte",cheque:"Chèque",
+ finishOut:"Valider la sortie",finishIn:"Valider le retour",
+ outDone:"La voiture est sortie ✓",outL:["Vidéo et photos enregistrées","Caution notée","Rappel WhatsApp 12 h avant le retour"],
+ qCarIn:"Quelle voiture revient ?",lateTag:"En retard",expected:"Prévue",
+ fuelMiss:x=>`Il manque ${x} d’essence`,fuelOk:"Le plein est fait ✓",
+ qNew:"Nouveau dégât ?",before:"À la sortie",after:"Au retour",
+ qMoney:"L’argent",depGot:"Caution reçue",fuelCost:"Essence manquante",dmgCost:"Dégâts",giveBack:"À rendre au client",stillDue:"Le client doit encore",
+ inDone:"La voiture est rentrée ✓",inL:["Facture créée","Rapport envoyé au client sur WhatsApp","Caution rendue"],
+ planT:"Planning",stFree:"Libre",stRented:d=>`Louée · retour ${d}`,stBooked:d=>`Réservée · ${d}`,stLate:h=>`En retard ${h} h`,search:"Chercher une voiture libre",from:"Du",to:"Au",nFree:n=>`${n} voitures libres`,
+ reqT:"Demandes",wantsBook:n=>`${n} veut réserver`,wantsMore:(n,d)=>`${n} veut ${d} jours de plus`,docsSent:"CIN et permis envoyés",seeDocs:"Voir les papiers",hideDocs:"Cacher les papiers",
+ accept:"Accepter",refuse:"Refuser",nothing:"Rien à traiter ✓",accepted:"Accepté ✓ · message envoyé au client",acceptedPrice:x=>`Accepté ✓ · prix envoyé au client : ${x}`,refused:"Refusé · message envoyé au client",bookedAfter:"Impossible : la voiture est réservée après",
+ bossT:"Espace patron",month:"Ce mois",ca:"Chiffre d’affaires",occ:"Voitures louées",repairs:"Réparations",dep:"Gardé sur cautions",maint:"Entretien à faire",team:"Équipe",perCar:"Par voiture",
+ maintL:["Dacia Logan · vignette expirée : ne peut pas sortir","Kia Picanto · visite technique dans 14 jours","Renault Clio · vidange dans 220 km"],
+ teamL:[["Ahmed K.","21 sorties ce mois"],["Mouna T.","17 sorties ce mois"],["Hedi S.","12 sorties ce mois"]],
+ days7:["dim","lun","mar","mer","jeu","ven","sam"],tomorrow:"demain",today:"aujourd’hui",yesterday:"hier",d3:["dim","lun","mar","mer","jeu","ven","sam"],
+ cars:"Voitures",carsS:"État, km, entretien",teamTile:"Équipe",teamS:"Qui fait quoi",maintAlert:n=>n>1?`${n} voitures à surveiller`:`${n} voiture à surveiller`,
+ legend:{free:"Libre",rented:"Louée",booked:"Réservée",late:"En retard"},week:"Les 7 prochains jours",fleet:n=>`La flotte · ${n} voitures`,addCar:"Ajouter une voiture",edit:"Modifier",
+ fModel:"Marque et modèle",fPlate:"Plaque",fKm:"Kilomètres",fDash:"Type de compteur",fOil:"Prochaine vidange à (km)",fIns:"Assurance jusqu’au",fVis:"Visite technique jusqu’au",fVig:"Vignette jusqu’au",save:"Enregistrer",
+ newCar:"Nouvelle voiture",editCar:"Modifier la voiture",remove:"Retirer de la flotte",removeQ:n=>`Retirer ${n} ?`,removeL:"Elle ne sera plus proposée à la sortie ni aux clients. Son historique est gardé.",yesRemove:"Oui, retirer",cancel:"Annuler",cantRemove:"Impossible : la voiture est louée. Attendez son retour.",
+ need:"Remplissez le modèle, la plaque et les kilomètres.",needName:"Écrivez le nom de l’employé.",
+ carsT:"Les voitures",sum:(n,f)=>`${n} voitures · ${f} libres`,allOk:"Tout est en ordre",oilName:"Vidange",
+ oilIn:k=>`Vidange dans ${k} km`,oilLate:k=>`Vidange dépassée de ${k} km`,oilDone:"Vidange faite",oilDoneOk:"Vidange notée ✓",
+ paperOk:d=>`jusqu’au ${d}`,paperSoon:n=>`expire dans ${n} jours`,paperBad:"EXPIRÉ",ins:"Assurance",vis:"Visite technique",vig:"Vignette",
+ maintH:"Entretien et papiers",histH:"Historique",noHist:"Rien pour le moment",kmNow:"Kilomètres",dashT:"Compteur",blocked:"Papier expiré : ne peut pas sortir",
+ teamT:"Équipe",whoWhat:"Qui s’occupe de quoi",journal:"Journal : qui a fait quoi",all:"Tous",addStaff:"Ajouter un employé",newStaff:"Nouvel employé",editStaff:"Modifier l’employé",
+ fName:"Nom",fTel:"WhatsApp",fJobs:"S’occupe de",lastAct:"Dernière action",removeStaff:"Retirer l’employé",ownerOnly:"Seul le patron peut ajouter, modifier ou retirer une voiture.",
+ jobs:{out:"Sorties",in:"Retours",book:"Réservations",maint:"Entretien",cash:"Caisse"},
+ logK:{out:"Sortie",in:"Retour",book:"Réservation acceptée",more:"Prolongation acceptée",oil:"Vidange faite",add:"Voiture ajoutée",edit:"Voiture modifiée",remove:"Voiture retirée",staff:"Employé ajouté"}},
+ar:{lang:"Français",hello:"مرحبًا",staff:"موظّف",owner:"صاحب الوكالة",asOwner:"عرض كصاحب الوكالة",asStaff:"عرض كموظّف",
+ note:"<b>نموذج للتجربة</b> · بيانات مثال. جرّب بالعربية والفرنسية، كموظّف أو كصاحب الوكالة.",
+ late:n=>`${n} سيارة متأخرة`,retToday:n=>`${n} سيارات ترجع اليوم`,reqs:n=>`${n} طلبات للمعالجة`,
+ out:"خروج",outS:"تسليم سيارة",in:"رجوع",inS:"استلام سيارة",plan:"الجدول",planS:"الشاغرة والمكتراة",req:"الطلبات",reqS:"حجوزات وتمديدات",
+ boss:"فضاء صاحب الوكالة",bossS:"المال، السيارات، الفريق",next:"التالي",back:"السابق",home:"الرئيسية",step:(a,b)=>`الخطوة ${a} من ${b}`,
+ qCarOut:"أيّ سيارة ستخرج؟",bookedToday:"محجوزة اليوم",free:"شاغرة",
+ qClient:"من يكتري السيارة؟",name:"اسم الحريف",phone:"واتساب الحريف",msgLang:"لغة الرسائل للحريف",fromBooking:"معبّأ من الحجز ✓",
+ qLic:"رخصة سياقة الحريف",licUntil:"الرخصة صالحة إلى غاية",licPhoto:"صورة الرخصة",licDone:"تمّ التقاط الصورة ✓",licChecked:"تمّ التثبّت منها عند الحجز ✓",licBad:"الرخصة منتهية: لا يمكن الكراء",
+ qFilm:"صوّر السيارة من كل الجهات",filmHint:"امسك الهاتف بالعرض واتبع السهم.",filmStart:"ابدأ التصوير",filmStop:"إنهاء",filmLeft:s=>`بقي ${s} ث`,filmOk:"الفيديو جاهز ✓",filmAgain:"إعادة التصوير",
+ sides:["الأمام","الجهة اليمنى","الخلف","الجهة اليسرى","الداخل"],sideHints:["الصدّام، الغطاء، اللوحة","الأبواب والعجلات","الصندوق واللوحة","الأبواب والعجلات","المقاعد والعدّاد"],
+ qDash:"صورة العدّاد",dashHint:"شغّل السيارة. يجب أن يظهر مجموع الكيلومترات والبنزين.",dashOdo:"لا يظهر إلا TRIP؟ اضغط على زرّ العدّاد حتى يظهر المجموع (ODO).",dashKinds:["بالإبر","رقمي","شاشة"],takePhoto:"التقط الصورة",read:"قراءة تلقائية",km:"الكيلومترات (المجموع)",fuel:"البنزين",right:"صحيح",fix:"تصحيح",tapFuel:"اضغط على مستوى البنزين",empty:"فارغ",full:"ممتلئ",kmLow:k=>`أقل من المرّة الفارطة (${k} كم). تثبّت.`,
+ qDmg:"هل هذه الأضرار صحيحة؟",dmgOf:(a,b)=>`${a} من ${b}`,isDmg:"هل هذا ضرر فعلًا؟",yes:"نعم",no:"لا",noDmg:"لا توجد أضرار ✓",
+ qDays:"كم يوم؟",days:"أيام",backOn:"الرجوع يوم",price:"السعر",perDay:"السعر في اليوم",total:"المجموع",typeIt:"اكتب المبلغ",
+ qDep:"الضمان",depAmount:"مبلغ الضمان",depHow:"طريقة الدفع؟",cash:"نقدًا",card:"بطاقة",cheque:"صك",
+ finishOut:"تأكيد الخروج",finishIn:"تأكيد الرجوع",
+ outDone:"خرجت السيارة ✓",outL:["تمّ حفظ الفيديو والصور","تمّ تسجيل الضمان","تذكير واتساب قبل الرجوع بـ12 ساعة"],
+ qCarIn:"أيّ سيارة رجعت؟",lateTag:"متأخرة",expected:"منتظرة",
+ fuelMiss:x=>`ينقص ${x} من البنزين`,fuelOk:"الخزّان ممتلئ ✓",
+ qNew:"ضرر جديد؟",before:"عند الخروج",after:"عند الرجوع",
+ qMoney:"المال",depGot:"الضمان المقبوض",fuelCost:"البنزين الناقص",dmgCost:"الأضرار",giveBack:"يُرجَع للحريف",stillDue:"يبقى على الحريف",
+ inDone:"رجعت السيارة ✓",inL:["تمّ إنشاء الفاتورة","تمّ إرسال التقرير للحريف على واتساب","تمّ إرجاع الضمان"],
+ planT:"الجدول",stFree:"شاغرة",stRented:d=>`مكتراة · ترجع ${d}`,stBooked:d=>`محجوزة · ${d}`,stLate:h=>`متأخرة ${h} س`,search:"ابحث عن سيارة شاغرة",from:"من",to:"إلى",nFree:n=>`${n} سيارات شاغرة`,
+ reqT:"الطلبات",wantsBook:n=>`${n} يريد الحجز`,wantsMore:(n,d)=>`${n} يريد ${d} أيام إضافية`,docsSent:"أرسل بطاقة التعريف والرخصة",seeDocs:"عرض الوثائق",hideDocs:"إخفاء الوثائق",
+ accept:"قبول",refuse:"رفض",nothing:"لا شيء للمعالجة ✓",accepted:"تمّ القبول ✓ · أُرسلت رسالة للحريف",acceptedPrice:x=>`تمّ القبول ✓ · أُرسل السعر للحريف: ${x}`,refused:"تمّ الرفض · أُرسلت رسالة للحريف",bookedAfter:"غير ممكن: السيارة محجوزة بعد ذلك",
+ bossT:"فضاء صاحب الوكالة",month:"هذا الشهر",ca:"رقم المعاملات",occ:"نسبة الكراء",repairs:"الإصلاحات",dep:"المحجوز من الضمانات",maint:"صيانة مطلوبة",team:"الفريق",perCar:"حسب السيارة",
+ maintL:["Dacia Logan · المعلوم منتهي: لا يمكن أن تخرج","Kia Picanto · الفحص الفني بعد 14 يومًا","Renault Clio · تغيير الزيت بعد 220 كم"],
+ teamL:[["Ahmed K.","21 خروج هذا الشهر"],["Mouna T.","17 خروج هذا الشهر"],["Hedi S.","12 خروج هذا الشهر"]],
+ days7:["الأحد","الإثنين","الثلاثاء","الأربعاء","الخميس","الجمعة","السبت"],tomorrow:"غدًا",today:"اليوم",yesterday:"أمس",d3:["أحد","اثنين","ثلاثاء","أربعاء","خميس","جمعة","سبت"],
+ cars:"السيارات",carsS:"الحالة، الكيلومترات، الصيانة",teamTile:"الفريق",teamS:"من يفعل ماذا",maintAlert:n=>`${n} سيارات تحتاج متابعة`,
+ legend:{free:"شاغرة",rented:"مكتراة",booked:"محجوزة",late:"متأخرة"},week:"الأيام السبعة القادمة",fleet:n=>`الأسطول · ${n} سيارات`,addCar:"إضافة سيارة",edit:"تعديل",
+ fModel:"النوع والموديل",fPlate:"اللوحة",fKm:"الكيلومترات",fDash:"نوع العدّاد",fOil:"تغيير الزيت القادم عند (كم)",fIns:"التأمين إلى غاية",fVis:"الفحص الفني إلى غاية",fVig:"المعلوم إلى غاية",save:"حفظ",
+ newCar:"سيارة جديدة",editCar:"تعديل السيارة",remove:"حذف من الأسطول",removeQ:n=>`حذف ${n}؟`,removeL:"لن تُقترح للخروج ولا للحرفاء. يبقى تاريخها محفوظًا.",yesRemove:"نعم، احذف",cancel:"إلغاء",cantRemove:"غير ممكن: السيارة مكتراة. انتظر رجوعها.",
+ need:"اكتب الموديل واللوحة والكيلومترات.",needName:"اكتب اسم الموظّف.",
+ carsT:"السيارات",sum:(n,f)=>`${n} سيارات · ${f} شاغرة`,allOk:"كل شيء على ما يرام",oilName:"تغيير الزيت",
+ oilIn:k=>`تغيير الزيت بعد ${k} كم`,oilLate:k=>`تجاوز موعد تغيير الزيت بـ${k} كم`,oilDone:"تمّ تغيير الزيت",oilDoneOk:"تمّ تسجيل تغيير الزيت ✓",
+ paperOk:d=>`إلى غاية ${d}`,paperSoon:n=>`ينتهي بعد ${n} يومًا`,paperBad:"منتهي",ins:"التأمين",vis:"الفحص الفني",vig:"المعلوم",
+ maintH:"الصيانة والوثائق",histH:"التاريخ",noHist:"لا شيء حاليًا",kmNow:"الكيلومترات",dashT:"العدّاد",blocked:"وثيقة منتهية: لا يمكن أن تخرج",
+ teamT:"الفريق",whoWhat:"من يهتمّ بماذا",journal:"السجلّ: من فعل ماذا",all:"الكل",addStaff:"إضافة موظّف",newStaff:"موظّف جديد",editStaff:"تعديل الموظّف",
+ fName:"الاسم",fTel:"واتساب",fJobs:"يهتمّ بـ",lastAct:"آخر عملية",removeStaff:"حذف الموظّف",ownerOnly:"صاحب الوكالة فقط يمكنه إضافة سيارة أو تعديلها أو حذفها.",
+ jobs:{out:"الخروج",in:"الرجوع",book:"الحجوزات",maint:"الصيانة",cash:"الخزينة"},
+ logK:{out:"خروج",in:"رجوع",book:"قبول حجز",more:"قبول تمديد",oil:"تغيير الزيت",add:"إضافة سيارة",edit:"تعديل سيارة",remove:"حذف سيارة",staff:"إضافة موظّف"}}};
+
+
+/* textes ajoutés pour la vraie application (s'ajoutent à ceux de la maquette) */
+const TX={
+fr:{offline:"Pas de connexion au serveur",offlineData:h=>`Hors ligne · données de ${h}`,badLogin:"Identifiant ou mot de passe refusé",forbidden:"Réservé au patron",
+ serverErr:"Erreur du serveur : réessayez",loading:"Chargement…",retry:"Réessayer",refresh:"Actualiser",settings:"Réglages",
+ todoDmg:"dégâts à vérifier",todoFinish:"retour à terminer",todoWait:"analyse en cours…",queue:n=>n>1?`${n} contrôles à envoyer`:`1 contrôle à envoyer`,
+ noCars:"Aucune voiture libre",noFleet:"Aucune voiture : le patron les ajoute dans Planning.",readFail:"Lecture automatique impossible : tapez les kilomètres et touchez le niveau d’essence.",
+ reading:"Lecture du compteur…",retake:"Reprendre la photo",licBefore:d=>`Le permis expire le ${d}, avant le retour : pas de location.`,fromRes:"Prix accepté avec la demande",
+ sending:"Envoi…",outL:["Vidéo, compteur et caution enregistrés","Rappel WhatsApp 12 h avant le retour","L’IA regarde la vidéo : vérifiez ensuite les dégâts"],
+ queued:"Enregistré dans le téléphone ✓",queuedL:"Pas de connexion : l’envoi se fera tout seul dès que le serveur répond. Vous terminerez ensuite depuis l’accueil.",
+ refusedT:"Refusé par le serveur",checkDmg:"Vérifier les dégâts",later:"Plus tard",analyzing:"L’IA regarde la vidéo…",
+ analyzingL:"Environ une minute. Attendez ici, ou revenez plus tard depuis l’accueil.",aiError:"L’analyse automatique n’a pas marché : continuez sans.",
+ dmgDoneOut:"Dégâts vérifiés ✓",rentPrice:(p,d)=>`Prix de la location : ${p} DT (${d} j)`,kmCost:"Kilomètres en trop",lateBy:h=>`Rendue en retard de ${h} h`,
+ invoiceN:n=>`Facture ${n}`,reportSent:"Rapport envoyé au client sur WhatsApp",reportNot:"Rapport non envoyé (WhatsApp pas encore réglé)",returned:"Rendu au client",
+ inL2:"Caution clôturée, permis et documents du client effacés",
+ fUser:"Identifiant (pour se connecter)",fPass:"Mot de passe (8 caractères minimum)",fPassNew:"Nouveau mot de passe (sinon laissez vide)",fRole:"Rôle",
+ fCat:"Catégorie",cats:{citadine:"Citadine",berline:"Berline",SUV:"SUV",utilitaire:"Utilitaire",minibus:"Minibus"},fPublic:"Proposée aux clients (page Réserver)",
+ noDate:"date non saisie",moreLinks:"Pages détaillées",links:[["/monthly","Bilan du mois"],["/checks","Tous les contrôles"],["/planning","Planning détaillé"]],
+ legend:{free:"Libre",rented:"Louée",booked:"Réservée",pending:"Demande",late:"En retard"},
+ logK:{out:"Sortie",in:"Retour",book:"Réservation acceptée",refuse:"Demande refusée",more:"Prolongation acceptée",oil:"Vidange faite",add:"Voiture ajoutée",
+  edit:"Voiture modifiée",remove:"Voiture retirée",staff:"Employé ajouté",close:"Location clôturée"},
+ rentals:"Locations terminées",costs:"Entretien et réparations",docsNone:"Pas de documents envoyés",needPrice:"Tapez le prix par jour",
+ phHint:"+216 98 000 000",oilUnknown:"Vidange : kilométrage de la dernière vidange non saisi",kmUnknown:"km inconnus",
+ dmgPending:n=>n>1?`${n} dégâts à vérifier`:`1 dégât à vérifier`,anyDmg:"Dégâts confirmés",noNew:"Aucun nouveau dégât ✓",
+ pickVideo:"Choisir ou filmer la vidéo",photoReq:"Prenez la photo du permis",okClose:"Terminer",offlineAction:"Pas de connexion : réessayez quand le réseau revient.",
+ roles:{staff:"Employé",owner:"Patron"},me:"Vous",
+ fuelNow:"Essence au retour",days1:n=>n>1?`${n} jours`:`1 jour`,returnedAt:"Rendue",
+ stLateShort:"En retard",addDmg:"Ajouter un dégât oublié",zoneQ:"Où ?",kindQ:"Quoi ?",add:"Ajouter",retOn:d=>`retour ${d}`,startOn:d=>`départ ${d}`},
+ar:{offline:"لا يوجد اتصال بالخادم",offlineData:h=>`بدون اتصال · بيانات الساعة ${h}`,badLogin:"اسم المستخدم أو كلمة السرّ غير صحيحة",forbidden:"خاص بصاحب الوكالة",
+ serverErr:"خطأ في الخادم: أعد المحاولة",loading:"جاري التحميل…",retry:"إعادة المحاولة",refresh:"تحديث",settings:"الإعدادات",
+ todoDmg:"أضرار للتثبّت",todoFinish:"رجوع لإتمامه",todoWait:"التحليل جارٍ…",queue:n=>`${n} في انتظار الإرسال`,
+ noCars:"لا توجد سيارة شاغرة",noFleet:"لا توجد سيارات: يضيفها صاحب الوكالة من الجدول.",readFail:"تعذّرت القراءة الآلية: اكتب الكيلومترات واضغط على مستوى البنزين.",
+ reading:"قراءة العدّاد…",retake:"إعادة الصورة",licBefore:d=>`تنتهي الرخصة يوم ${d}، قبل الرجوع: لا يمكن الكراء.`,fromRes:"السعر المتّفق عليه في الطلب",
+ sending:"جاري الإرسال…",outL:["تمّ حفظ الفيديو والعدّاد والضمان","تذكير واتساب قبل الرجوع بـ12 ساعة","الذكاء الاصطناعي يشاهد الفيديو: تثبّت من الأضرار بعد ذلك"],
+ queued:"تمّ الحفظ في الهاتف ✓",queuedL:"لا يوجد اتصال: سيتمّ الإرسال تلقائيًا عند توفّر الاتصال. ثم تُكمل من الصفحة الرئيسية.",
+ refusedT:"رفضه الخادم",checkDmg:"التثبّت من الأضرار",later:"لاحقًا",analyzing:"الذكاء الاصطناعي يشاهد الفيديو…",
+ analyzingL:"حوالي دقيقة. انتظر هنا أو ارجع لاحقًا من الصفحة الرئيسية.",aiError:"لم ينجح التحليل الآلي: واصل بدونه.",
+ dmgDoneOut:"تمّ التثبّت من الأضرار ✓",rentPrice:(p,d)=>`سعر الكراء: ${p} دينار (${d} يوم)`,kmCost:"كيلومترات زائدة",lateBy:h=>`رجعت متأخرة بـ${h} س`,
+ invoiceN:n=>`فاتورة ${n}`,reportSent:"أُرسل التقرير للحريف على واتساب",reportNot:"لم يُرسل التقرير (واتساب غير مُفعّل بعد)",returned:"يُرجَع للحريف",
+ inL2:"أُغلق الضمان وحُذفت رخصة الحريف ووثائقه",
+ fUser:"اسم المستخدم (للدخول)",fPass:"كلمة السرّ (8 أحرف على الأقل)",fPassNew:"كلمة سرّ جديدة (وإلا اتركها فارغة)",fRole:"الدور",
+ fCat:"الصنف",cats:{citadine:"صغيرة",berline:"سيدان",SUV:"رباعية الدفع",utilitaire:"نفعية",minibus:"حافلة صغيرة"},fPublic:"معروضة للحرفاء (صفحة الحجز)",
+ noDate:"التاريخ غير مُدخل",moreLinks:"صفحات مفصّلة",links:[["/monthly","حصيلة الشهر"],["/checks","كل المراقبات"],["/planning","الجدول المفصّل"]],
+ legend:{free:"شاغرة",rented:"مكتراة",booked:"محجوزة",pending:"طلب",late:"متأخرة"},
+ logK:{out:"خروج",in:"رجوع",book:"قبول حجز",refuse:"رفض طلب",more:"قبول تمديد",oil:"تغيير الزيت",add:"إضافة سيارة",edit:"تعديل سيارة",
+  remove:"حذف سيارة",staff:"إضافة موظّف",close:"إغلاق الكراء"},
+ rentals:"عمليات كراء منتهية",costs:"الصيانة والإصلاحات",docsNone:"لم تُرسل وثائق",needPrice:"اكتب السعر في اليوم",
+ phHint:"+216 98 000 000",oilUnknown:"تغيير الزيت: كيلومترات آخر تغيير غير مُدخلة",kmUnknown:"الكيلومترات غير معروفة",
+ dmgPending:n=>`${n} أضرار للتثبّت`,anyDmg:"أضرار مؤكّدة",noNew:"لا يوجد ضرر جديد ✓",
+ pickVideo:"اختر أو صوّر الفيديو",photoReq:"التقط صورة الرخصة",okClose:"إنهاء",offlineAction:"لا يوجد اتصال: أعد المحاولة عند رجوع الشبكة.",
+ roles:{staff:"موظّف",owner:"صاحب الوكالة"},me:"أنت",
+ fuelNow:"البنزين عند الرجوع",days1:n=>`${n} يوم`,returnedAt:"رجعت",
+ stLateShort:"متأخرة",addDmg:"إضافة ضرر لم يُكتشف",zoneQ:"أين؟",kindQ:"ما نوعه؟",add:"إضافة",retOn:d=>`الرجوع ${d}`,startOn:d=>`الخروج ${d}`}};
+for(const l of ["fr","ar"])Object.assign(T[l],TX[l]);
+
+/* ---------- icônes ---------- */
+const I={
+ out:'<svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 15l1.6-4.5A2 2 0 016.5 9h7a2 2 0 011.9 1.5L17 15"/><rect x="2" y="15" width="16" height="4" rx="1"/><circle cx="6" cy="19" r="1.4"/><circle cx="14" cy="19" r="1.4"/><path d="M18 6h4m0 0l-2-2m2 2l-2 2"/></svg>',
+ in:'<svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 15l1.6-4.5A2 2 0 0110.5 9h7a2 2 0 011.9 1.5L21 15"/><rect x="6" y="15" width="16" height="4" rx="1"/><circle cx="10" cy="19" r="1.4"/><circle cx="18" cy="19" r="1.4"/><path d="M6 6H2m0 0l2-2M2 6l2 2"/></svg>',
+ plan:'<svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/><path d="M7 14h3M14 14h3M7 17h3"/></svg>',
+ req:'<svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v12H8l-4 4z"/><path d="M8 9h8M8 12h5"/></svg>',
+ boss:'<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>',
+ back:'<svg class="flip" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>',
+ cam:'<svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>',
+ video:'<svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="2" y="6" width="14" height="12" rx="2"/><path d="M16 10l6-3v10l-6-3z"/></svg>',
+ check:'<svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"/></svg>',
+ tick:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="color:var(--out);flex:none"><path d="M5 12.5l4.5 4.5L19 7"/></svg>',
+ team:'<svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><circle cx="17" cy="9" r="2.6"/><path d="M15.5 14.2c3 .2 5.5 2.6 5.5 5.8"/></svg>',
+ fleet:'<svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14l1.6-4.5A2 2 0 017.5 8h9a2 2 0 011.9 1.5L20 14"/><rect x="3" y="14" width="18" height="4" rx="1"/><circle cx="7" cy="18" r="1.4"/><circle cx="17" cy="18" r="1.4"/><path d="M8 4h8"/></svg>',
+ car:'<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14l1.6-4.5A2 2 0 017.5 8h9a2 2 0 011.9 1.5L20 14"/><rect x="3" y="14" width="18" height="4" rx="1"/><circle cx="7" cy="18" r="1.4"/><circle cx="17" cy="18" r="1.4"/></svg>'};
+
+
+/* ================= Car Check · application agence =================
+   Même page dans le navigateur (fetch vers le serveur) et dans l'application Android
+   (window.CC : pont natif → requêtes avec identifiants, caméra, file d'attente hors ligne). */
+const APP=typeof window.CC!=="undefined";
+const DAY=86400;
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const p2=n=>String(n).padStart(2,"0");
+const nf=n=>n==null?"—":Number(n).toLocaleString("fr-FR");
+const money=x=>`${Number(x||0).toLocaleString("fr-FR",{maximumFractionDigits:3})} DT`;
+const iso=d=>`${d.getFullYear()}-${p2(d.getMonth()+1)}-${p2(d.getDate())}`;
+const lsGet=(k,d)=>{try{return localStorage.getItem(k)||d}catch(e){return d}};
+const lsSet=(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}};
+let S={lang:lsGet("cc-lang","fr"),screen:"home",stack:[],step:0,f:{},st:null,offline:false,cachedAt:null,msg:"",busy:false};
+const t=()=>T[S.lang];
+const own=()=>S.st&&S.st.me.role==="owner";
+const cars=()=>(S.st&&S.st.cars)||[];
+const carOf=p=>cars().find(c=>c.plate===p);
+
+/* ---------- dates ---------- */
+const dayDiff=ts=>{const a=new Date(ts*1000);a.setHours(0,0,0,0);const b=new Date();b.setHours(0,0,0,0);return Math.round((a-b)/864e5)};
+function dshort(ts){const L=t(),d=new Date(ts*1000),n=dayDiff(ts);
+ const day=n===0?L.today:n===1?L.tomorrow:n===-1?L.yesterday:`${L.days7[d.getDay()]} ${p2(d.getDate())}/${p2(d.getMonth()+1)}`;return`${day} ${p2(d.getHours())}:${p2(d.getMinutes())}`}
+const fmtD=v=>{if(!v)return"";const[y,m,d]=v.split("-");return`${d}/${m}/${y}`};
+const daysTo=v=>Math.round((new Date(v+"T00:00")-new Date(iso(new Date())+"T00:00"))/864e5);
+
+/* ---------- serveur ---------- */
+let rid=0;const waiting={};
+window.ccDone=(id,status,text,cached)=>{const cb=waiting[id];delete waiting[id];if(cb)cb({status,text,cached:!!cached})};
+function parse(r){let j=null;try{j=JSON.parse(r.text)}catch(e){}
+ const L=t();const ok=r.status===200&&j&&j.ok!==false;
+ return{ok,status:r.status,j:j||{},cached:r.cached,offline:r.status===0,
+  err:ok?"":(j&&(j.error||(typeof j.detail==="string"?j.detail:"")))||(r.status===0?L.offline:r.status===401?L.badLogin:r.status===403?L.forbidden:L.serverErr)}}
+function api(method,path,data){
+ if(APP)return new Promise(res=>{const id="r"+(++rid);waiting[id]=res;CC.request(id,method,path,data?JSON.stringify(data):"")}).then(parse);
+ const o={method,credentials:"same-origin"};
+ if(data){const b=new URLSearchParams();for(const k in data)b.append(k,data[k]??"");o.body=b}
+ return fetch(path,o).then(async r=>({status:r.status,text:await r.text()}),()=>({status:0,text:""})).then(parse)}
+function postFiles(path,fields,files){ /* navigateur seulement : files = {nom: File} */
+ const fd=new FormData();for(const k in fields)fd.append(k,fields[k]??"");for(const k in files)if(files[k])fd.append(k,files[k]);
+ return fetch(path,{method:"POST",body:fd,credentials:"same-origin"}).then(async r=>({status:r.status,text:await r.text()}),()=>({status:0,text:""})).then(parse)}
+function hydrate(){document.querySelectorAll("img[data-src]").forEach(img=>{const p=img.dataset.src;img.removeAttribute("data-src");
+ if(!APP){img.src=p;return}const id="i"+(++rid);waiting[id]=r=>{if(r.status===200&&r.text)img.src=r.text};CC.image(id,p)})}
+const pic=(path,alt="")=>path?`<img data-src="${esc(path)}" alt="${esc(alt)}">`:`<div class="muted-box">—</div>`;
+
+async function loadState(){
+ const r=await api("GET","/api/a/state");
+ if(r.status===200&&r.j.ok){S.st=r.j;S.offline=!!r.cached;S.cachedAt=r.cached?r.j.now:null;if(!r.cached)lsSet("cc-state",JSON.stringify(r.j))}
+ else if(!APP&&r.offline&&!S.st){try{const c=JSON.parse(lsGet("cc-state",""));if(c){S.st=c;S.offline=true;S.cachedAt=c.now}}catch(e){}}
+ else if(r.offline&&S.st){S.offline=true;S.cachedAt=S.cachedAt||S.st.now}
+ if(!r.ok&&!S.st)S.loadErr=r.err;else S.loadErr="";
+ return r}
+
+/* ---------- navigation ---------- */
+function go(sc,keep){S.stack.push(S.screen);S.screen=sc;if(!keep)S.f={};S.step=0;S.msg="";render();window.scrollTo(0,0)}
+function back(){if((S.screen==="out"||S.screen==="in")&&S.step>0){S.step--;S.msg="";render();return true}
+ if(S.screen==="home")return false;S.screen=S.stack.pop()||"home";if(S.screen==="home")S.stack=[];S.msg="";render();if(S.screen==="home")refreshHome();return true}
+window.ccBack=()=>back();
+function home(){S.screen="home";S.stack=[];S.f={};S.msg="";render();window.scrollTo(0,0);refreshHome()}
+async function refreshHome(){await loadState();if(S.screen==="home"||((S.screen==="out"||S.screen==="in")&&S.step===0))render()}
+function toast(m){S.msg=m;render()}
+
+/* ---------- squelette ---------- */
+function frame(inner,{title,color,back=true}={}){const L=t();const me=S.st?S.st.me:null;
+ const banner=S.offline?`<p class="banner">${L.offlineData(S.cachedAt?new Date(S.cachedAt*1000).toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit"}):"—")}</p>`:"";
+ return`<header class="top">${back&&S.screen!=="home"?`<button class="iconbtn" data-act="back" aria-label="${L.back}">${I.back}</button>`:""}
+  <div class="who"><b>${esc(title||(S.st?S.st.agency:"Car Check"))}</b><span>${me?esc(me.name)+" · "+(L.roles[me.role]||""):""}</span></div>
+  <button class="pill-btn" data-act="lang">${L.lang}</button></header>${banner}
+ <main style="--c:var(--${color||"out"})">${inner}</main>${S.msg?`<div class="toast" role="status">${esc(S.msg)}</div>`:""}`}
+function wizard(steps,inner,{color,ok=true,label,noNext=false}={}){const L=t();
+ return`<div class="prog" style="--c:var(--${color})">${steps.map((_,i)=>`<i class="${i<=S.step?"on":""}"></i>`).join("")}</div>
+  <div class="stepno">${L.step(S.step+1,steps.length)}</div>${inner}<div class="spacer"></div>
+  ${noNext?"":`<div class="footer"><button class="big" data-act="next" ${ok&&!S.busy?"":"disabled"}>${S.busy?L.sending:label||L.next}</button></div>`}`}
+
+/* ---------- états des voitures ---------- */
+function stChip(c){const L=t();
+ if(c.st==="late")return`<span class="st late">${L.stLateShort}</span>`;
+ if(c.st==="rented")return`<span class="st rented">${L.stRented(c.ret?dshort(c.ret):"—")}</span>`;
+ if(c.st==="booked")return`<span class="st booked">${L.stBooked(dshort(c.start))}</span>`;
+ return`<span class="st free">${L.stFree}</span>`}
+function issues(c){const L=t(),list=[];
+ c.papers.filter(p=>p.lvl===2).forEach(p=>list.push([2,`${L[p.k]} : ${L.paperBad}`]));
+ if(c.oil.lvl===2)list.push([2,L.oilLate(nf(-c.oil.left))]);
+ c.papers.filter(p=>p.lvl===1).forEach(p=>list.push([1,`${L[p.k]} : ${p.d?L.paperSoon(p.n):L.noDate}`]));
+ if(c.oil.lvl===1)list.push([1,L.oilIn(nf(c.oil.left))]);
+ return list}
+function issueText(c){const l=issues(c);return l.length?l[0][1]+(l.length>1?` (+${l.length-1})`:""):""}
+const fuelTxt=e8=>{const L=t();if(e8==null)return"—";if(e8<=0)return L.empty;if(e8>=8)return L.full;const g=e8%4===0?4:e8%2===0?2:1;return`${e8/g}/${8/g}`};
+const gauge=e8=>`<div class="gauge">${Array.from({length:8},(_,i)=>`<i class="${i<(e8||0)?"on":""}"></i>`).join("")}</div>`;
+
+/* ================= ACCUEIL ================= */
+function homeScreen(){const L=t();
+ if(!S.st)return frame(`<div class="center">${S.loadErr?`<div class="badmsg">${esc(S.loadErr)}</div><button class="big" data-act="reload">${L.retry}</button>`
+   +(APP?`<button class="big light" data-act="settings">${L.settings}</button>`:""):`<div class="spin"></div><p class="sub">${L.loading}</p>`}</div>`,{back:false});
+ const cs=cars(),late=cs.filter(c=>c.st==="late").length,ret=cs.filter(c=>c.st==="rented"&&c.ret&&dayDiff(c.ret)<=0).length+late;
+ const maint=cs.filter(c=>c.lvl>0).length,reqs=S.st.requests,q=APP?CC.queueCount():0;
+ const todo=S.st.todo.map(x=>{const col=x.what==="finish"?"in":x.what==="dmg"?"out":"plan";
+  return`<button class="todo-row" style="--c:var(--${col})" data-todo="${esc(x.id)}"><span class="dot"></span><span>${esc(x.car_name)} · ${x.what==="finish"?L.todoFinish:x.what==="dmg"?L.todoDmg:L.todoWait}<small>${esc(x.client)}${x.client?" · ":""}${dshort(x.ts)}</small></span></button>`}).join("");
+ return frame(`<h1>${L.hello} ${esc(S.st.me.name.split(" ")[0])}</h1>
+  <div class="alerts">${q?`<button class="alert bad" data-act="queue"><span class="dot"></span>${L.queue(q)}</button>`:""}
+   ${late?`<button class="alert bad" data-go="plan"><span class="dot"></span>${L.late(late)}</button>`:""}
+   ${reqs?`<button class="alert req" data-go="req"><span class="dot"></span>${L.reqs(reqs)}</button>`:""}
+   ${maint?`<button class="alert plan" data-go="cars"><span class="dot"></span>${L.maintAlert(maint)}</button>`:""}
+   ${ret?`<button class="alert in" data-go="plan"><span class="dot"></span>${L.retToday(ret)}</button>`:""}${todo}</div>
+  <div class="tiles">
+   <button class="tile out" data-go="out"><span class="ic">${I.out}</span><span>${L.out}<small>${L.outS}</small></span></button>
+   <button class="tile in" data-go="in"><span class="ic">${I.in}</span><span>${L.in}<small>${L.inS}</small></span></button>
+   <button class="tile plan" data-go="plan"><span class="ic">${I.plan}</span><span>${L.plan}<small>${L.planS}</small></span></button>
+   <button class="tile req" data-go="req">${reqs?`<span class="badge">${reqs}</span>`:""}<span class="ic">${I.req}</span><span>${L.req}<small>${L.reqS}</small></span></button>
+   <button class="tile cars ${own()?"":"wide"}" data-go="cars"><span class="ic">${I.fleet}</span><span>${L.cars}<small>${L.carsS}</small></span></button>
+   ${own()?`<button class="tile team" data-go="team"><span class="ic">${I.team}</span><span>${L.teamTile}<small>${L.teamS}</small></span></button>
+   <button class="tile boss" data-go="boss"><span class="ic">${I.boss}</span><span>${L.boss}<small>${L.bossS}</small></span></button>`:""}
+  </div><div class="spacer"></div>
+  <div class="linkrow" style="justify-content:center"><button class="pill-btn" data-act="reload">↻ ${L.refresh}</button>${APP?`<button class="pill-btn" data-act="settings">${L.settings}</button>`:""}</div>`,{back:false})}
+
+/* ================= SORTIE / RETOUR : capture ================= */
+const OUT_STEPS=["car","client","lic","film","dash","days","dep"];
+const IN_STEPS=["car","film","dash"];
+function startFlow(kind){S.f={kind,key:APP?CC.newItem():null,files:{},thumbs:{},cl:S.lang};S.step=0}
+function pickFile(name,accept,capture){const inp=document.createElement("input");inp.type="file";inp.accept=accept;if(capture)inp.setAttribute("capture","environment");
+ inp.className="hidden-input";document.body.appendChild(inp);
+ inp.onchange=()=>{const f=inp.files[0];inp.remove();if(!f)return;const F=S.f;F.files[name]=f;
+  if(name==="video"){F.film=true;F.secs=0;const v=document.createElement("video");v.preload="metadata";v.onloadedmetadata=()=>{F.secs=Math.round(v.duration||0);render()};v.src=URL.createObjectURL(f)}
+  else F.thumbs[name]=URL.createObjectURL(f);
+  F[name+"Ok"]=true;if(name==="dash")readDash();render()};inp.click()}
+window.ccFilmed=(key,ok,secs)=>{const F=S.f;if(key!==F.key)return;if(ok){F.film=true;F.secs=secs}render()};
+window.ccPhoto=(key,name,ok,thumb)=>{const F=S.f;if(key!==F.key||!ok)return;F.thumbs[name]=thumb;F[name+"Ok"]=true;if(name==="dash")readDash();render()};
+async function readDash(){const F=S.f;F.reading=true;F.read=null;F.dashOk=false;F.fixing=false;render();
+ let r;if(APP)r=await new Promise(res=>{const id="d"+(++rid);waiting[id]=res;CC.post(id,"/api/a/dash-read",F.key,JSON.stringify({photo:"dash.jpg"}),"{}")}).then(parse);
+ else r=await postFiles("/api/a/dash-read",{},{photo:F.files.dash});
+ F.reading=false;const rd=r.ok&&r.j.read;
+ if(rd&&rd.km!=null){F.read=rd;F.km=rd.km;F.e8=rd.fuel8!=null?rd.fuel8:F.e8;if(rd.fuel8==null)F.fixing=true}
+ else{F.fixing=true;F.readFail=true;const c=carOf(F.car);if(F.km==null&&c&&c.km!=null)F.km=c.km;if(F.e8==null)F.e8=S.f.kind==="out"?8:4}
+ render()}
+
+function carChoice(c,extra,dis){return`<button class="choice ${S.f.car===c.plate?"sel":""} ${c.st==="late"?"late":""}" data-pick="${esc(c.plate)}" ${dis?"disabled":""}>
+ <span class="carico">${I.car}</span><span><b>${esc(c.name)}</b><span dir="ltr" style="display:inline">${esc(c.plate)}</span><span>${extra||""}</span></span></button>`}
+function flow(){const L=t(),F=S.f,kind=F.kind,steps=kind==="out"?OUT_STEPS:IN_STEPS,k=steps[S.step],color=kind==="out"?"out":"in";let inner="",ok=true,label;
+ const c=carOf(F.car);
+ if(k==="car"){
+  if(kind==="out"){const booked=cars().filter(x=>x.st==="booked"),free=cars().filter(x=>x.st==="free");
+   inner=`<h1>${L.qCarOut}</h1>${booked.length?`<div class="group">${L.bookedToday}</div>${booked.map(x=>carChoice(x,` · ${esc(x.res.name)} · ${dshort(x.start)}`,x.blocked)).join("")}`:""}
+    <div class="group">${L.free}</div>${free.length?free.map(x=>carChoice(x,x.blocked?`<br><b style="color:var(--bad);display:inline">${L.blocked}</b>`:"",x.blocked)).join(""):`<p class="sub">${cars().length?L.noCars:L.noFleet}</p>`}`}
+  else{const out=cars().filter(x=>x.st==="rented"||x.st==="late").sort((a,b)=>(b.st==="late")-(a.st==="late"));
+   inner=`<h1>${L.qCarIn}</h1>${out.length?out.map(x=>carChoice(x,` · ${esc(x.client)}<br>${x.st==="late"?`<b style="color:var(--bad);display:inline">${L.lateTag}</b> · `:""}${L.expected} ${x.ret?dshort(x.ret):"—"}`)).join(""):`<p class="sub">${L.nothing}</p>`}`}
+  ok=!!F.car}
+ if(k==="client"){const r=c&&c.res;
+  inner=`<h1>${L.qClient}</h1>${r?`<div class="okmsg">${I.tick}${L.fromBooking}</div>`:""}
+   <div class="field"><label for="f-n">${L.name}</label><input id="f-n" data-f="name" type="text" value="${esc(F.name||"")}" autocomplete="off"></div>
+   <div class="field"><label for="f-t">${L.phone}</label><input id="f-t" data-f="tel" type="tel" dir="ltr" placeholder="${L.phHint}" value="${esc(F.tel||"")}"></div>
+   <div class="field"><label>${L.msgLang}</label><div class="seg"><button data-cl="fr" class="${F.cl==="fr"?"sel":""}">Français</button><button data-cl="ar" class="${F.cl==="ar"?"sel":""}">العربية</button></div></div>`;
+  ok=okClient()}
+ if(k==="lic"){const r=c&&c.res,hasDocs=r&&r.docs&&r.docs.license_front,bad=F.lic&&F.lic<iso(new Date());
+  inner=`<h1>${L.qLic}</h1>${hasDocs?`<div class="okmsg">${I.tick}${L.licChecked}</div>`:""}
+   <div class="field"><label for="f-l">${L.licUntil}</label><input id="f-l" data-f="lic" type="date" value="${esc(F.lic||"")}"></div>
+   ${bad?`<div class="badmsg">${L.licBad}</div>`:""}
+   ${F.licenseOk?`${F.thumbs.license?`<img class="thumb" src="${esc(F.thumbs.license)}" alt="">`:""}<div class="okmsg">${I.tick}${L.licDone}</div><button class="big light" data-act="photo" data-name="license">${L.retake}</button>`
+    :`<button class="cam" data-act="photo" data-name="license"><span class="ic">${I.cam}</span>${L.licPhoto}</button>`}`;
+  ok=!!F.lic&&!bad&&(F.licenseOk||hasDocs)}
+ if(k==="film"){inner=F.film?`<h1>${L.qFilm}</h1><div class="okmsg">${I.tick}${L.filmOk}${F.secs?` · ${Math.floor(F.secs/60)}:${p2(F.secs%60)}`:""}</div><button class="big light" data-act="film">${L.filmAgain}</button>`
+   :`<h1>${L.qFilm}</h1><p class="sub">${L.filmHint}</p><button class="cam" data-act="film"><span class="ic">${I.video}</span>${APP?L.filmStart:L.pickVideo}</button>`;ok=!!F.film}
+ if(k==="dash"){inner=dashStep();ok=!!F.dashOk}
+ if(k==="days"){const n=F.days||1,r=new Date(Date.now()+n*864e5),licBad=F.lic&&F.lic<iso(r);
+  inner=`<h1>${L.qDays}</h1><div class="stepper"><button data-act="minus" aria-label="−">−</button><output>${n}<small>${L.days}</small></output><button data-act="plus" aria-label="+">+</button></div>
+   <div class="infobox"><span>${L.backOn} <b>${dshort(r.getTime()/1000)}</b></span></div>${licBad?`<div class="badmsg">${L.licBefore(fmtD(F.lic))}</div>`:""}
+   <div class="field"><label for="f-price">${L.perDay}</label><div class="money-in"><input id="f-price" data-f="price" type="number" inputmode="decimal" min="1" dir="ltr" placeholder="${L.typeIt}" value="${esc(F.price??"")}"><span>DT</span></div></div>
+   ${F.priceFromRes?`<p class="sub">${L.fromRes}</p>`:""}
+   <div class="infobox" id="price-total" ${F.price>0?"":"hidden"}><span>${L.total} <b dir="ltr">${n} × ${F.price||0} = ${n*(F.price||0)} DT</b></span></div>`;ok=F.price>0&&!licBad}
+ if(k==="dep"){inner=`<h1>${L.qDep}</h1>
+   <div class="field"><label for="f-dep">${L.depAmount}</label><div class="money-in"><input id="f-dep" data-f="dep" type="number" inputmode="decimal" min="0" dir="ltr" placeholder="${L.typeIt}" value="${esc(F.dep??"")}"><span>DT</span></div></div>
+   <div class="field"><label>${L.depHow}</label><div class="seg"><button data-pay="cash" class="${(F.pay||"cash")==="cash"?"sel":""}">${L.cash}</button><button data-pay="card" class="${F.pay==="card"?"sel":""}">${L.card}</button><button data-pay="cheque" class="${F.pay==="cheque"?"sel":""}">${L.cheque}</button></div></div>`;
+  ok=F.dep!=null&&F.dep!==""}
+ if(S.step===steps.length-1)label=kind==="out"?L.finishOut:L.finishIn;
+ return frame(wizard(steps,inner,{color,ok,label}),{title:kind==="out"?L.out:L.in,color})}
+const okClient=()=>!!((S.f.name||"").trim()&&(S.f.tel||"").replace(/\D/g,"").length>=8);
+function dashStep(){const L=t(),F=S.f,c=carOf(F.car);
+ if(!F.dashOk&&!F.thumbs.dash&&!F.dashOk0)return`<h1>${L.qDash}</h1><p class="sub">${L.dashHint}</p>
+  <div class="infobox">${L.dashOdo}</div><button class="cam" data-act="photo" data-name="dash"><span class="ic">${I.cam}</span>${L.takePhoto}</button>`;
+ const low=c&&c.km!=null&&F.km!=null&&F.km<c.km;
+ const kind=F.read&&F.read.dash_type&&F.read.dash_type!=="unknown"?L.dashKinds[{analog:0,digital:1,screen:2}[F.read.dash_type]]:null;
+ return`<h1>${L.qDash}</h1>${F.thumbs.dash?`<img class="thumb" src="${esc(F.thumbs.dash)}" alt="">`:""}
+  ${F.reading?`<div class="center"><div class="spin"></div><p class="sub">${L.reading}</p></div>`:`
+  ${F.read&&!F.fixing?`<span class="dtype">${L.read}${kind?" · "+kind:""}</span>`:F.readFail?`<p class="sub">${L.readFail}</p>`:""}
+  ${F.fixing?`<div class="field"><label for="f-km">${L.km}</label><input id="f-km" data-f="km" type="number" inputmode="numeric" dir="ltr" value="${F.km??""}"></div>
+   <div class="badmsg" id="kmlow" ${low?"":"hidden"}>${c?L.kmLow(nf(c.km)):""}</div>
+   <div class="field"><label>${L.tapFuel}</label><div class="gauge tap">${Array.from({length:8},(_,i)=>`<button data-e8="${i+1}" class="${i<(F.e8||0)?"on":""}" aria-label="${fuelTxt(i+1)}"></button>`).join("")}</div>
+   <div class="gauge-ends"><button class="pill-btn" data-e8="0" style="color:var(--ink);border-color:var(--line)">${L.empty}</button><b>${fuelTxt(F.e8)}</b><span>${L.full}</span></div></div>`
+  :`<div class="reading"><div><b dir="ltr">${nf(F.km)}</b><span>${L.km}</span></div><div>${gauge(F.e8)}<b style="font-size:1.2rem;margin-top:6px">${fuelTxt(F.e8)}</b><span>${L.fuel}</span></div></div>`}
+  ${S.f.kind==="in"&&c&&c.fuel_out8!=null&&F.e8!=null?`<div class="${c.fuel_out8>F.e8?"badmsg":"okmsg"}">${c.fuel_out8>F.e8?L.fuelMiss(fuelTxt(c.fuel_out8-F.e8)):I.tick+L.fuelOk}</div>`:""}
+  ${F.dashOk?`<div class="okmsg">${I.tick}${L.right}</div><button class="big light" data-act="dashfix">${L.fix}</button>`
+   :F.fixing?`<button class="big" data-act="dashok" ${F.km==null||F.e8==null?"disabled":""}>${L.right}</button>`
+   :`<div class="yesno"><button class="big" data-act="dashok">${L.right}</button><button class="big light" data-act="dashfix">${L.fix}</button></div>`}
+  <button class="big light" data-act="photo" data-name="dash">${L.retake}</button>`}`}
+
+function fieldsOf(){const F=S.f,c=carOf(F.car);const d={kind:F.kind,car:F.car,km:String(F.km),fuel8:String(F.e8)};
+ if(F.kind==="out")Object.assign(d,{client_name:F.name.trim(),client_phone:F.tel,client_lang:F.cl,license_expiry:F.lic,days:String(F.days||1),
+  price_day:String(F.price),deposit:String(F.dep),pay:F.pay||"cash"});
+ return d}
+async function submit(){const F=S.f;S.busy=true;render();
+ if(APP){CC.submit(F.key,JSON.stringify(fieldsOf()));return}   /* réponse : window.ccSubmitted */
+ const r=await postFiles("/api/a/checks",fieldsOf(),{video:F.files.video,dash:F.files.dash,license:F.files.license});
+ S.busy=false;afterSubmit(r.ok?"sent":r.offline?"offline":"refused",r.err,r.j)}
+window.ccSubmitted=(key,state,message,body)=>{if(key!==S.f.key)return;S.busy=false;let j={};try{j=JSON.parse(body||"{}")}catch(e){}afterSubmit(state,message,j)};
+function afterSubmit(state,err,j){const F=S.f;
+ if(state==="sent"){const kind=F.kind;S.f={kind,checkId:j.check_id,sent:true};S.screen=kind==="out"?"doneOut":"wait";S.stack=["home"];render();if(kind==="in")poll();loadState();return}
+ if(state==="queued"){S.f={kind:F.kind,queued:true};S.screen="queued";S.stack=["home"];render();return}
+ S.msg=(state==="offline"?t().offlineAction:"")||err||t().serverErr;render()}
+
+/* ================= FIN : analyse, dégâts, argent ================= */
+let pollT=null;
+async function poll(){clearTimeout(pollT);const F=S.f;if(S.screen!=="wait"||!F.checkId)return;
+ const r=await api("GET","/api/a/checks/"+encodeURIComponent(F.checkId));
+ if(S.screen!=="wait"||S.f!==F)return;
+ if(r.ok&&!["uploaded","analyzing"].includes(r.j.status)){F.check=r.j;S.screen="review";S.step=0;render();return}
+ pollT=setTimeout(poll,3000)}
+function openTodo(id){S.stack.push(S.screen);S.f={checkId:id};S.screen="wait";render();poll()}
+function waitScreen(){const L=t();return frame(`<div class="center" style="padding-top:30px"><div class="spin"></div><h1>${L.analyzing}</h1><p class="sub">${L.analyzingL}</p></div>
+ <div class="spacer"></div><button class="big light" data-act="home">${L.later}</button>`,{title:S.f.kind==="out"?L.out:L.in,color:S.f.kind==="out"?"out":"in"})}
+function pendingMarks(){const c=S.f.check;return c.marks.filter(m=>m.status==="ai"&&(c.kind==="out"||m.is_new))}
+function reviewScreen(){const L=t(),F=S.f,c=F.check,kind=c.kind,color=kind==="out"?"out":"in";
+ const pend=pendingMarks(),cur=pend[0],steps=kind==="in"?["dmg","money"]:["dmg"];
+ if(kind==="in"&&F.moneyStep)return moneyScreen();
+ let inner;
+ if(cur){const done=c.marks.filter(m=>(c.kind==="out"||m.is_new)&&m.status!=="ai").length,total=done+pend.length;
+  inner=`<h1>${kind==="in"?L.qNew:L.isDmg}</h1><div class="stepno">${esc(c.car_name)} · ${L.dmgOf(done+1,total)}</div>
+   ${kind==="in"?`<div class="pair"><figure><div class="photo">${pic(cur.before)}</div><figcaption>${L.before}</figcaption></figure><figure><div class="photo">${pic(cur.photo)}</div><figcaption>${L.after}</figcaption></figure></div>`
+    :`<div class="photo">${pic(cur.photo)}</div>`}
+   <div class="infobox"><b style="font-size:1.2rem">${esc(cur[S.lang]||cur.fr)}</b></div>
+   <div class="yesno"><button class="big" data-mark="${cur.id}" data-s="confirmed">✓ ${L.yes}</button><button class="big no" data-mark="${cur.id}" data-s="rejected">✗ ${L.no}</button></div>`;
+  return frame(`<div class="prog" style="--c:var(--${color})">${steps.map((_,i)=>`<i class="${i===0?"on":""}"></i>`).join("")}</div>${inner}`,{title:kind==="out"?L.out:L.in,color})}
+ const kept=c.marks.filter(m=>m.status==="confirmed"&&(kind==="out"||m.is_new));
+ if(F.adding){const lab=x=>esc(x[S.lang]||x.fr);
+  return frame(`<h1>${L.addDmg}</h1><div class="stepno">${esc(c.car_name)}</div>
+   <div class="field"><label>${L.zoneQ}</label><div class="seg-wrap">${c.zones.map(z=>`<button class="toggle ${F.az===z.k?"sel":""}" data-az="${z.k}" style="--c:var(--${color})">${lab(z)}</button>`).join("")}</div></div>
+   <div class="field"><label>${L.kindQ}</label><div class="seg-wrap">${c.kinds.map(k=>`<button class="toggle ${F.ak===k.k?"sel":""}" data-ak="${k.k}" style="--c:var(--${color})">${lab(k)}</button>`).join("")}</div></div>
+   <div class="spacer"></div><div class="footer"><button class="big" data-act="adddmg" ${F.az&&F.ak&&!S.busy?"":"disabled"}>${L.add}</button></div>
+   <button class="big light" data-act="noadd">${L.cancel}</button>`,{title:kind==="out"?L.out:L.in,color})}
+ inner=`<h1>${kind==="in"?L.qNew:L.qDmg}</h1><div class="stepno">${esc(c.car_name)}</div>${c.ai_error?`<div class="badmsg">${L.aiError}</div>`:""}
+  ${kept.length?kept.map(m=>`<div class="infobox"><b>${esc(m[S.lang]||m.fr)}</b></div>`).join(""):`<div class="okmsg">${I.tick}${kind==="in"?L.noNew:L.noDmg}</div>`}
+  <button class="big light" data-act="addform">+ ${L.addDmg}</button>`;
+ return frame(`<div class="prog" style="--c:var(--${color})">${steps.map((_,i)=>`<i class="${i===0?"on":""}"></i>`).join("")}</div>${inner}<div class="spacer"></div>
+  <div class="footer"><button class="big" data-act="${kind==="in"?"tomoney":"finish"}" ${S.busy?"disabled":""}>${kind==="in"?L.next:L.okClose}</button></div>`,{title:kind==="out"?L.out:L.in,color})}
+function moneyCalc(){const F=S.f,m=F.check.money,dmg=F.dmg>0?F.dmg:0,tot=(m.fuel||0)+(m.km_cost||0)+dmg;return{tot,back:Math.max(0,m.deposit-tot),due:Math.max(0,tot-m.deposit),dmg}}
+function moneyScreen(){const L=t(),F=S.f,c=F.check,m=c.money,x=moneyCalc(),anyNew=c.marks.some(k=>k.is_new&&k.status==="confirmed");
+ return frame(`<div class="prog" style="--c:var(--in)"><i class="on"></i><i class="on"></i></div><h1>${L.qMoney}</h1><div class="stepno">${esc(c.car_name)}${c.client?" · "+esc(c.client):""}</div>
+  ${m.late_h?`<div class="badmsg">${L.lateBy(m.late_h)}</div>`:""}
+  <p class="sub">${L.rentPrice(nf(m.price),m.days||1)}</p>
+  <div class="money"><div class="mrow"><span>${L.depGot}</span><b dir="ltr">${money(m.deposit)}</b></div>
+   <div class="mrow"><span>− ${L.fuelCost} <small dir="ltr">(${fuelTxt(m.fuel_out8)} → ${fuelTxt(m.fuel_in8)})</small></span><b dir="ltr">${money(m.fuel)}</b></div>
+   ${m.km_cost?`<div class="mrow"><span>− ${L.kmCost}</span><b dir="ltr">${money(m.km_cost)}</b></div>`:""}
+   ${anyNew||F.dmg?`<div class="mrow"><span>− ${L.dmgCost}</span><input id="f-dmg" data-f="dmg" type="number" inputmode="decimal" dir="ltr" min="0" step="10" value="${F.dmg??""}" placeholder="0"></div>`:""}
+   <div class="mrow total"><span>${L.giveBack}</span><b dir="ltr" id="m-back">${money(x.back)}</b></div>
+   <div class="badmsg" id="m-due" ${x.due?"":"hidden"}>${L.stillDue} <bdi dir="ltr">${money(x.due)}</bdi></div></div>
+  ${!m.ready?`<div class="badmsg">${esc(m.why)}</div>`:""}<div class="spacer"></div>
+  <div class="footer"><button class="big" data-act="finish" ${S.busy||!m.ready?"disabled":""}>${S.busy?L.sending:L.finishIn}</button></div>`,{title:L.in,color:"in"})}
+async function finish(){const F=S.f,c=F.check;S.busy=true;render();
+ const r=await api("POST",`/api/a/checks/${encodeURIComponent(c.id)}/finish`,c.kind==="in"?{damages:String(moneyCalc().dmg)}:{});
+ S.busy=false;if(!r.ok){toast(r.err);return}
+ F.result=r.j;S.screen=c.kind==="in"?"doneIn":"doneDmg";S.stack=["home"];render();loadState()}
+
+function doneScreen(){const L=t(),F=S.f,sc=S.screen,col=sc==="doneOut"||sc==="doneDmg"?"out":sc==="queued"?"plan":"in";let title,lines,extra="";
+ if(sc==="doneOut"){title=L.outDone;lines=L.outL;extra=`<button class="big" data-todo="${esc(F.checkId)}">${L.checkDmg}</button>`}
+ else if(sc==="doneDmg"){title=L.dmgDoneOut;lines=[]}
+ else if(sc==="queued"){title=L.queued;lines=[L.queuedL]}
+ else{const r=F.result;title=L.inDone;lines=[L.invoiceN(r.invoice),`${L.returned} : ${money(r.returned)}`+(r.still_due?` · ${L.stillDue} ${money(r.still_due)}`:""),r.report_sent?L.reportSent:L.reportNot,L.inL2]}
+ return frame(`<div class="done" style="--c:var(--${col})"><span class="ic">${sc==="queued"?I.cam:I.check}</span><h1>${title}</h1>
+  ${lines.length?`<ul>${lines.map(x=>`<li>${I.tick}<span>${esc(x)}</span></li>`).join("")}</ul>`:""}</div><div class="spacer"></div>${extra}
+  <button class="big ${extra?"light":""}" data-act="home" style="--c:var(--${col})">${L.home}</button>`,{title:col==="out"?L.out:L.in,color:col,back:false})}
+
+/* ================= PLANNING ================= */
+function planning(){const L=t(),cs=cars(),d0=new Date();
+ const head=`<span></span>${Array.from({length:7},(_,i)=>{const d=new Date(d0.getTime()+i*864e5);return`<span class="h ${i?"":"today"}">${L.d3[d.getDay()]}<br>${d.getDate()}</span>`}).join("")}`;
+ const rows=cs.map(c=>`<button class="rl" data-car="${esc(c.plate)}">${esc(c.name)}<small dir="ltr">${esc(c.plate)}</small></button>${c.days.map(s=>`<i class="cell ${s}" title="${L.legend[s]}"></i>`).join("")}`).join("");
+ const q=S.f.q;let res="";
+ if(q)res=q.err?`<div class="badmsg">${esc(q.err)}</div>`:`<div class="okmsg">${I.tick}${L.nFree(q.list.length)}</div>${q.list.map(p=>{const c=carOf(p)||{name:p,plate:p};return`<div class="car-row"><span class="carico">${I.car}</span><div class="meta"><b>${esc(c.name)}</b><span dir="ltr">${esc(c.plate)}</span></div></div>`}).join("")}`;
+ const a=S.f.qa||iso(new Date(Date.now()+864e5)),b=S.f.qb||iso(new Date(Date.now()+3*864e5));
+ return frame(`<h1>${L.planT}</h1><h2>${L.week}</h2>
+  <div class="legend">${["free","rented","booked","pending","late"].map(k=>`<span><i class="cell ${k}" style="min-height:0"></i>${L.legend[k]}</span>`).join("")}</div>
+  ${cs.length?`<div class="tl">${head}${rows}</div>`:`<p class="sub">${L.noFleet}</p>`}
+  <h2>${L.search}</h2><div class="seg" style="grid-auto-columns:1fr"><div class="field"><label for="q-a">${L.from}</label><input id="q-a" data-f="qa" type="date" value="${a}"></div>
+  <div class="field"><label for="q-b">${L.to}</label><input id="q-b" data-f="qb" type="date" value="${b}"></div></div>
+  <button class="big" data-act="search">${L.search}</button>${res}
+  <h2>${L.fleet(cs.length)}</h2>
+  ${own()?`<button class="big" data-act="addcar">+ ${L.addCar}</button>`:`<p class="sub">${L.ownerOnly}</p>`}
+  ${cs.map(c=>`<div class="car-row"><div class="meta"><b>${esc(c.name)}</b><span dir="ltr">${esc(c.plate)} · ${c.km!=null?nf(c.km)+" km":L.kmUnknown}</span></div>${own()?`<button class="mini" data-editcar="${esc(c.plate)}">${L.edit}</button>`:stChip(c)}</div>`).join("")}`,{title:L.plan,color:"plan"})}
+
+function carForm(){const L=t(),F=S.f,f=F.form,editing=!!F.edit;
+ const inp=(k,label,type,extra="")=>`<div class="field"><label for="ff-${k}">${label}</label><input id="ff-${k}" data-k="${k}" type="${type}" ${extra} value="${esc(f[k]??"")}"></div>`;
+ const c=editing&&carOf(F.edit);
+ return frame(`<h1>${editing?L.editCar:L.newCar}</h1>${inp("name",L.fModel,"text",'placeholder="Kia Picanto"')}
+  ${inp("plate",L.fPlate,"text",`dir="ltr" placeholder="123 TU 4567" ${editing?"readonly":""}`)}${inp("km",L.fKm,"number",'inputmode="numeric" dir="ltr"')}
+  <div class="field"><label>${L.fCat}</label><div class="seg-wrap">${Object.keys(L.cats).map(k=>`<button class="toggle ${f.category===k?"sel":""}" data-cat="${k}">${L.cats[k]}</button>`).join("")}</div></div>
+  <div class="field"><label>${L.fDash}</label><div class="seg">${[0,1,2].map(k=>`<button data-fdt="${k}" class="${+f.dt===k?"sel":""}">${L.dashKinds[k]}</button>`).join("")}</div></div>
+  ${inp("oil_next",L.fOil,"number",'inputmode="numeric" dir="ltr"')}${inp("ins",L.fIns,"date")}${inp("vis",L.fVis,"date")}${inp("vig",L.fVig,"date")}
+  <label class="consent" style="display:flex;gap:12px;align-items:center"><input type="checkbox" data-k="public" ${f.public!=="0"?"checked":""} style="width:26px;height:26px"><span>${L.fPublic}</span></label>
+  <button class="big" data-act="savecar" ${S.busy?"disabled":""}>${L.save}</button>
+  ${editing?(F.ask?(c&&(c.st==="rented"||c.st==="late")?`<div class="badmsg">${L.cantRemove}</div>`
+    :`<div class="infobox"><b>${L.removeQ(esc(f.name))}</b><span>${L.removeL}</span></div><div class="yesno"><button class="big no" data-act="doremove">${L.yesRemove}</button><button class="big light" data-act="noremove">${L.cancel}</button></div>`)
+   :`<button class="big light" data-act="askremove" style="color:var(--bad)">${L.remove}</button>`):""}`,{title:L.plan,color:"plan"})}
+
+/* ================= VOITURES ================= */
+function carsScreen(){const L=t(),cs=[...cars()].sort((a,b)=>b.lvl-a.lvl);
+ return frame(`<h1>${L.carsT}</h1><p class="sub">${L.sum(cs.length,cs.filter(c=>c.st==="free").length)}</p>
+  ${cs.length?"":`<p class="sub">${L.noFleet}</p>`}
+  ${cs.map(c=>{const it=issueText(c);return`<button class="carcard lvl${c.lvl}" data-car="${esc(c.plate)}"><div class="cc-top"><b>${esc(c.name)}</b>${stChip(c)}</div>
+   <span dir="ltr" style="text-align:start">${esc(c.plate)} · ${c.km!=null?nf(c.km)+" km":L.kmUnknown}</span>${it?`<span class="issue l${c.lvl}">${esc(it)}</span>`:`<span class="okline">${I.tick}${L.allOk}</span>`}</button>`}).join("")}`,{title:L.cars,color:"cars"})}
+function carScreen(){const L=t(),d=S.f.car;if(!d)return frame(`<div class="spin"></div>`,{title:L.cars,color:"cars"});
+ const o=d.oil;
+ const oilTxt=o.left==null?L.oilUnknown:o.left<0?L.oilLate(nf(-o.left)):L.oilIn(nf(o.left));
+ return frame(`<h1>${esc(d.name)}</h1><div class="cc-top"><span class="sub" dir="ltr">${esc(d.plate)}</span>${stChip(d)}</div>
+  <div class="reading"><div><b dir="ltr">${nf(d.km)}</b><span>${L.kmNow}</span></div><div><b style="font-size:1.1rem">${L.dashKinds[d.dt]||"—"}</b><span>${L.dashT}</span></div></div>
+  <h2>${L.maintH}</h2>
+  <div class="car-row l${o.lvl}"><div class="meta"><b>${L.oilName}</b><span>${oilTxt}</span></div>${S.f.oilOk?"":`<button class="mini" data-act="oil">${L.oilDone}</button>`}</div>
+  ${S.f.oilOk?`<div class="okmsg">${I.tick}${L.oilDoneOk}</div>`:""}
+  ${d.papers.map(p=>`<div class="car-row l${p.lvl}"><div class="meta"><b>${L[p.k]}</b><span>${!p.d?L.noDate:p.lvl===2?L.paperBad+" · "+fmtD(p.d):p.lvl===1?L.paperSoon(p.n)+" · "+fmtD(p.d):L.paperOk(fmtD(p.d))}</span></div></div>`).join("")}
+  ${own()?`<button class="big light" data-editcar="${esc(d.plate)}">${L.edit}</button>`:""}
+  <h2>${L.histH}</h2>${d.history.length?d.history.map(logRow).join(""):`<p class="sub">${L.noHist}</p>`}`,{title:L.cars,color:"cars"})}
+const logRow=e=>{const L=t();return`<div class="logrow"><span class="when">${dshort(e.ts)}</span><b><bdi>${esc(e.who_name)}</bdi> · ${L.logK[e.kind]||esc(e.kind)}</b><span>${[e.car_name,e.detail!==e.car_name?e.detail:""].filter(Boolean).map(x=>`<bdi>${esc(x)}</bdi>`).join(" · ")||"&nbsp;"}</span></div>`};
+async function openCar(plate){S.stack.push(S.screen);S.screen="car";S.f={plate};render();
+ const r=await api("GET","/api/a/cars/"+encodeURIComponent(plate));if(S.screen!=="car")return;
+ if(r.ok)S.f.car=r.j;else{S.f.car=Object.assign({history:[]},carOf(plate)||{});if(!carOf(plate)){back();toast(r.err);return}}render()}
+
+/* ================= DEMANDES ================= */
+function reqScreen(){const L=t(),R=S.f.r;
+ if(!R)return frame(`<div class="spin"></div>`,{title:L.req,color:"req"});
+ const slots={id_front:"CIN / Passeport",id_back:"CIN · verso",license_front:"Permis",license_back:"Permis · verso"};
+ const book=r=>{const done=S.f.done[`b${r.id}`];return`<div class="req-card" style="${done?"opacity:.75":""}"><div class="t">${L.wantsBook(esc(r.name))}</div>
+  <div class="sub">${esc(r.car_name)} · ${dshort(r.start)} → ${dshort(r.end)} · ${L.days1(r.days)}<br><span dir="ltr">+${esc(r.phone)}</span></div>
+  ${Object.keys(r.docs).length?`<button class="big light" data-docs="${r.id}">${S.f.open[r.id]?L.hideDocs:L.seeDocs}</button>
+   ${S.f.open[r.id]?`<div class="docs">${Object.entries(r.docs).map(([k,p])=>`<figure style="margin:0">${pic(p,slots[k])}<figcaption class="sub" style="font-size:.75rem">${slots[k]||k}</figcaption></figure>`).join("")}</div>
+   ${r.license_expiry?`<p class="sub">${L.licUntil} ${fmtD(r.license_expiry)}</p>`:""}`:""}`:`<p class="sub">${L.docsNone}</p>`}
+  ${done?`<div class="${done.ok?"okmsg":"badmsg"}">${done.ok?I.tick+`<span>${L.acceptedPrice(`<bdi dir="ltr">${done.txt}</bdi>`)}</span>`:esc(done.txt)}</div>`
+   :`<div class="field"><label for="rp-${r.id}">${L.perDay}</label><div class="money-in"><input id="rp-${r.id}" data-rp="${r.id}" type="number" inputmode="decimal" min="1" dir="ltr" placeholder="${L.typeIt}" value="${esc(S.f.price[r.id]??"")}"><span>DT</span></div>
+    <b id="rpt-${r.id}" dir="ltr" ${S.f.price[r.id]>0?"":"hidden"}>${r.days} × ${S.f.price[r.id]||0} = ${r.days*(S.f.price[r.id]||0)} DT</b></div>
+   <div class="yesno"><button class="big" data-res="${r.id}" data-ok="1" style="--c:var(--out)" ${S.f.price[r.id]>0?"":"disabled"}>✓ ${L.accept}</button><button class="big no" data-res="${r.id}" data-ok="0">✗ ${L.refuse}</button></div>`}</div>`};
+ const ext=e=>{const done=S.f.done[`e${e.id}`];return`<div class="req-card"><div class="t">${L.wantsMore(esc(e.name),e.days)}</div>
+  <div class="sub">${esc(e.car_name)} · ${L.expected} ${e.ret?dshort(e.ret):"—"}<br><span dir="ltr">+${esc(e.phone)}</span></div>
+  ${done?`<div class="${done.ok?"okmsg":"badmsg"}">${done.ok?I.tick:""}${esc(done.txt)}</div>`
+   :`<div class="yesno"><button class="big" data-ext="${e.id}" data-ok="1" style="--c:var(--out)">✓ ${L.accept}</button><button class="big no" data-ext="${e.id}" data-ok="0">✗ ${L.refuse}</button></div>`}</div>`};
+ const n=R.res.length+R.ext.length;
+ return frame(`<h1>${L.reqT}</h1>${n?R.res.map(book).join("")+R.ext.map(ext).join(""):`<div class="okmsg">${I.tick}${L.nothing}</div>`}`,{title:L.req,color:"req"})}
+async function openReq(){S.f.r=null;S.f.open={};S.f.done={};S.f.price={};render();
+ const r=await api("GET","/api/a/requests");if(S.screen!=="req")return;
+ if(!r.ok){back();toast(r.err);return}S.f.r=r.j;render()}
+
+/* ================= ÉQUIPE ================= */
+function teamScreen(){const L=t(),D=S.f.team;if(!D)return frame(`<div class="spin"></div>`,{title:L.teamTile,color:"team"});
+ const flt=S.f.flt||"",people=D.people.filter(p=>p.active);
+ return frame(`<h1>${L.teamT}</h1><h2>${L.whoWhat}</h2>
+  ${people.map(p=>`<button class="carcard" data-staff="${esc(p.username)}"><div class="cc-top"><b><bdi>${esc(p.name||p.username)}</bdi></b><span class="mini" aria-hidden="true">${L.edit}</span></div>
+   <span dir="ltr" style="text-align:start">${esc(p.username)}${p.phone?" · +"+esc(p.phone):""}</span>
+   <div class="chips">${p.role==="owner"?`<span class="chip">${L.roles.owner}</span>`:""}${p.jobs.map(j=>`<span class="chip">${L.jobs[j]||j}</span>`).join("")}</div>
+   ${p.last?`<span>${L.lastAct} : ${L.logK[p.last.kind]||""}${p.last.car_name?` · <bdi>${esc(p.last.car_name)}</bdi>`:""} · ${dshort(p.last.ts)}</span>`:""}</button>`).join("")}
+  <button class="big" data-act="addstaff">+ ${L.addStaff}</button>
+  <h2>${L.journal}</h2><div class="filters">${[["",L.all],...people.map(p=>[p.username,(p.name||p.username).split(" ")[0]])].map(([u,n])=>`<button class="toggle ${flt===u?"sel":""}" data-flt="${esc(u)}">${esc(n)}</button>`).join("")}</div>
+  ${D.log.length?D.log.map(logRow).join(""):`<p class="sub">${L.noHist}</p>`}`,{title:L.teamTile,color:"team"})}
+async function openTeam(){const r=await api("GET","/api/a/team"+(S.f.flt?"?who="+encodeURIComponent(S.f.flt):""));if(S.screen!=="team")return;
+ if(!r.ok){back();toast(r.err);return}S.f.team=r.j;render()}
+function staffForm(){const L=t(),F=S.f,f=F.form,isNew=!F.edit;
+ const inp=(k,label,type,extra="")=>`<div class="field"><label for="ff-${k}">${label}</label><input id="ff-${k}" data-k="${k}" type="${type}" ${extra} value="${esc(f[k]??"")}"></div>`;
+ return frame(`<h1>${isNew?L.newStaff:L.editStaff}</h1>${inp("name",L.fName,"text")}
+  ${inp("username",L.fUser,"text",`dir="ltr" autocapitalize="off" autocomplete="off" ${isNew?"":"readonly"}`)}
+  ${inp("password",isNew?L.fPass:L.fPassNew,"password",'autocomplete="new-password" dir="ltr"')}${inp("phone",L.fTel,"tel",`dir="ltr" placeholder="${L.phHint}"`)}
+  <div class="field"><label>${L.fJobs}</label><div class="seg-wrap">${Object.keys(L.jobs).map(j=>`<button class="toggle ${f.jobs.includes(j)?"sel":""}" data-job="${j}">${f.jobs.includes(j)?"✓ ":""}${L.jobs[j]}</button>`).join("")}</div></div>
+  <div class="field"><label>${L.fRole}</label><div class="seg">${["staff","owner"].map(r=>`<button data-role="${r}" class="${f.role===r?"sel":""}">${L.roles[r]}</button>`).join("")}</div></div>
+  <button class="big" data-act="savestaff" ${S.busy?"disabled":""}>${L.save}</button>
+  ${!isNew&&F.edit!==S.st.me.username?(F.ask?`<div class="infobox"><b>${L.removeQ(esc(f.name))}</b></div><div class="yesno"><button class="big no" data-act="dorstaff">${L.yesRemove}</button><button class="big light" data-act="noremove">${L.cancel}</button></div>`
+   :`<button class="big light" data-act="askremove" style="color:var(--bad)">${L.removeStaff}</button>`):""}`,{title:L.teamTile,color:"team"})}
+
+/* ================= PATRON ================= */
+function bossScreen(){const L=t(),B=S.f.boss,cs=cars().filter(c=>c.lvl>0).sort((a,b)=>b.lvl-a.lvl);
+ const k=B?`<div class="kpis"><div class="kpi"><b dir="ltr">${money(B.revenue)}</b><span>${L.ca}</span></div><div class="kpi"><b>${Math.round(B.occupancy*100)} %</b><span>${L.occ}</span></div>
+   <div class="kpi"><b>${B.rentals}</b><span>${L.rentals}</span></div><div class="kpi"><b dir="ltr">${money(B.costs)}</b><span>${L.costs}</span></div></div>`:`<div class="spin"></div>`;
+ const links=L.links.map(([p,n])=>APP?`<button class="pill-btn" data-open="${p}">${n}</button>`:`<a class="pill-btn" href="${p}" target="_blank" rel="noopener">${n}</a>`).join("");
+ return frame(`<h1>${L.bossT}</h1><span class="example">${L.month}</span>${k}
+  <h2>${L.maint}</h2>${cs.length?cs.map(c=>`<button class="carcard lvl${c.lvl}" data-car="${esc(c.plate)}"><b>${esc(c.name)}</b><span class="issue l${c.lvl}">${esc(issueText(c))}</span></button>`).join(""):`<div class="okmsg">${I.tick}${L.allOk}</div>`}
+  ${B&&B.per_car.length?`<h2>${L.perCar}</h2>${B.per_car.map(x=>`<div class="car-row"><div class="meta"><b>${esc(x.name)}</b><div class="bar"><i style="width:${Math.round(x.occ*100)}%"></i></div></div><b>${Math.round(x.occ*100)}%</b></div>`).join("")}`:""}
+  <h2>${L.moreLinks}</h2><div class="linkrow">${links}</div>`,{title:L.boss,color:"boss"})}
+async function openBoss(){const r=await api("GET","/api/a/boss");if(S.screen!=="boss")return;if(r.ok){S.f.boss=r.j;render()}else toast(r.err)}
+
+/* ================= rendu ================= */
+const SCREENS={home:homeScreen,out:flow,in:flow,doneOut:doneScreen,doneIn:doneScreen,doneDmg:doneScreen,queued:doneScreen,wait:waitScreen,review:reviewScreen,
+ plan:planning,carForm,cars:carsScreen,car:carScreen,req:reqScreen,team:teamScreen,staffForm,boss:bossScreen};
+function render(){document.documentElement.lang=S.lang;document.documentElement.dir=S.lang==="ar"?"rtl":"ltr";
+ $("#app").innerHTML=(SCREENS[S.screen]||homeScreen)();hydrate();bindInputs();keepFlow()}
+/* Android : si le téléphone ferme l'application pendant la caméra, l'assistant reprend à la même étape */
+function keepFlow(){if(!APP)return;try{if((S.screen==="out"||S.screen==="in")&&S.f.key)localStorage.setItem("cc-flow",JSON.stringify({screen:S.screen,step:S.step,f:S.f}));else localStorage.removeItem("cc-flow")}catch(e){}}
+function restoreFlow(){if(!APP)return;try{const fl=JSON.parse(localStorage.getItem("cc-flow")||"null");if(fl&&fl.f&&fl.f.key){S.screen=fl.screen;S.step=fl.step;S.f=fl.f;S.stack=["home"]}}catch(e){}}
+function bindInputs(){const F=S.f;
+ document.querySelectorAll("[data-f]").forEach(e=>{const k=e.dataset.f;const h=()=>{let v=e.value;
+  if(["km","e8"].includes(k))v=v===""?null:parseInt(v,10);
+  if(["price","dep","dmg"].includes(k))v=v===""?null:parseFloat(v.replace(",","."));
+  F[k]=v;onField(k)};e.addEventListener(e.type==="date"?"change":"input",h)})
+ document.querySelectorAll("[data-k]").forEach(e=>e.addEventListener(e.type==="checkbox"?"change":"input",()=>{F.form[e.dataset.k]=e.type==="checkbox"?(e.checked?"1":"0"):e.value}));
+ document.querySelectorAll("[data-rp]").forEach(e=>e.addEventListener("input",()=>{const id=e.dataset.rp,v=parseFloat(e.value.replace(",","."));F.price[id]=v>0?v:0;
+  const r=F.r.res.find(x=>String(x.id)===id),b=$("#rpt-"+id);b.hidden=!(v>0);b.textContent=`${r.days} × ${F.price[id]} = ${r.days*F.price[id]} DT`;
+  const btn=document.querySelector(`[data-res="${id}"][data-ok="1"]`);if(btn)btn.disabled=!(v>0)}))}
+function setNext(ok){const b=document.querySelector('[data-act="next"]');if(b)b.disabled=!ok}
+function onField(k){const F=S.f;
+ if(k==="name"||k==="tel")setNext(okClient());
+ if(k==="lic")render();
+ if(k==="km"){const c=carOf(F.car),w=$("#kmlow");if(w)w.hidden=!(c&&c.km!=null&&F.km!=null&&F.km<c.km);const ok=document.querySelector('[data-act="dashok"]');if(ok)ok.disabled=F.km==null||F.e8==null}
+ if(k==="price"){const n=F.days||1,box=$("#price-total"),licBad=F.lic&&F.lic<iso(new Date(Date.now()+n*864e5));if(box){box.hidden=!(F.price>0);box.innerHTML=`<span>${t().total} <b dir="ltr">${n} × ${F.price} = ${n*F.price} DT</b></span>`}setNext(F.price>0&&!licBad)}
+ if(k==="dep")setNext(F.dep!=null&&!isNaN(F.dep)&&F.dep>=0);
+ if(k==="dmg"){const x=moneyCalc();$("#m-back").textContent=money(x.back);const d=$("#m-due");d.hidden=!x.due;d.innerHTML=`${t().stillDue} <bdi dir="ltr">${money(x.due)}</bdi>`}}
+
+document.addEventListener("click",async e=>{const b=e.target.closest("button");if(!b||b.disabled)return;const F=S.f,L=t(),a=b.dataset.act;
+ if(a==="lang"){S.lang=S.lang==="fr"?"ar":"fr";lsSet("cc-lang",S.lang);render();return}
+ if(a==="back"){back();return}
+ if(a==="home"){home();return}
+ if(a==="reload"){S.msg="";await loadState();render();return}
+ if(a==="settings"){CC.settings();return}
+ if(a==="queue"){CC.openQueue();return}
+ if(b.dataset.open){CC.openServer(b.dataset.open);return}
+ if(b.dataset.go){const g=b.dataset.go;
+  if(g==="out"||g==="in"){S.stack.push(S.screen);S.screen=g;startFlow(g);render();window.scrollTo(0,0);return}
+  go(g);if(g==="req")openReq();if(g==="team")openTeam();if(g==="boss")openBoss();return}
+ if(b.dataset.todo){openTodo(b.dataset.todo);return}
+ if(b.dataset.car){openCar(b.dataset.car);return}
+ /* --- assistant sortie / retour --- */
+ if(b.dataset.pick){const c=carOf(b.dataset.pick);F.car=c.plate;
+  if(F.kind==="out"){const r=c.res;F.name=r?r.name:"";F.tel=r?r.phone:"";F.cl=r?r.lang:S.lang;F.lic=r&&r.license_expiry||"";F.days=r?r.days:1;F.price=r&&r.price_day||null;F.priceFromRes=!!(r&&r.price_day)}
+  F.km=c.km;F.e8=null;render();return}
+ if(a==="next"){const steps=F.kind==="out"?OUT_STEPS:IN_STEPS;if(S.step<steps.length-1){S.step++;S.msg="";render();window.scrollTo(0,0)}else submit();return}
+ if(b.dataset.cl){F.cl=b.dataset.cl;render();return}
+ if(a==="photo"){const n=b.dataset.name;if(APP)CC.photo(F.key,n);else pickFile(n,"image/*",true);return}
+ if(a==="film"){F.film=false;if(APP)CC.film(F.key);else pickFile("video","video/*",true);render();return}
+ if(a==="dashok"){if(F.km==null||F.e8==null)return;F.dashOk=true;F.fixing=false;render();return}
+ if(a==="dashfix"){F.fixing=true;F.dashOk=false;if(F.e8==null)F.e8=4;render();return}
+ if(b.dataset.e8){F.e8=+b.dataset.e8;render();return}
+ if(a==="minus"||a==="plus"){F.days=Math.max(1,Math.min(365,(F.days||1)+(a==="plus"?1:-1)));render();return}
+ if(b.dataset.pay){F.pay=b.dataset.pay;render();return}
+ /* --- fin : dégâts, argent --- */
+ if(b.dataset.mark){const id=+b.dataset.mark,s=b.dataset.s;b.disabled=true;const r=await api("POST",`/api/a/marks/${id}`,{s});
+  if(!r.ok){toast(r.err);return}const m=F.check.marks.find(x=>x.id===id);m.status=s;S.msg="";render();return}
+ if(a==="tomoney"){F.moneyStep=true;render();return}
+ if(a==="addform"){F.adding=true;F.az=null;F.ak=null;render();window.scrollTo(0,0);return}
+ if(a==="noadd"){F.adding=false;render();return}
+ if(b.dataset.az){F.az=b.dataset.az;render();return}
+ if(b.dataset.ak){F.ak=b.dataset.ak;render();return}
+ if(a==="adddmg"){S.busy=true;render();const r=await api("POST",`/api/a/checks/${encodeURIComponent(F.check.id)}/marks`,{zone:F.az,kind:F.ak});S.busy=false;
+  if(!r.ok){toast(r.err);return}F.check=r.j;F.adding=false;render();return}
+ if(a==="finish"){finish();return}
+ /* --- planning et flotte --- */
+ if(a==="search"){const r=await api("GET",`/api/a/free?start=${F.qa||iso(new Date(Date.now()+864e5))}&end=${F.qb||iso(new Date(Date.now()+3*864e5))}`);
+  F.q=r.ok?{list:r.j.cars}:{err:r.err};render();return}
+ if(a==="addcar"){S.stack.push(S.screen);S.screen="carForm";S.f={form:{dt:0,public:"1",category:""}};render();window.scrollTo(0,0);return}
+ if(b.dataset.editcar){const c=carOf(b.dataset.editcar);S.stack.push(S.screen);S.screen="carForm";
+  const p=k=>(c.papers.find(x=>x.k===k)||{}).d||"";
+  S.f={edit:c.plate,form:{name:c.name,plate:c.plate,km:c.km??"",dt:c.dt,category:c.category,oil_next:c.oil.next??"",ins:p("ins"),vis:p("vis"),vig:p("vig"),public:String(c.public)}};
+  render();window.scrollTo(0,0);return}
+ if(b.dataset.cat){F.form.category=F.form.category===b.dataset.cat?"":b.dataset.cat;render();return}
+ if(b.dataset.fdt){F.form.dt=+b.dataset.fdt;render();return}
+ if(a==="savecar"){const f=F.form;if(!(f.name||"").trim()||!(f.plate||"").trim()){toast(L.need);return}
+  S.busy=true;render();const r=await api("POST","/api/a/cars",{plate:f.plate,name:f.name,km:String(f.km??""),dt:String(f.dt||0),category:f.category||"",
+   oil_next:String(f.oil_next??""),ins:f.ins||"",vis:f.vis||"",vig:f.vig||"",public:f.public==="0"?"0":"1",old_plate:F.edit||""});
+  S.busy=false;if(!r.ok){toast(r.err);return}await loadState();back();return}
+ if(a==="askremove"){F.ask=true;render();return}
+ if(a==="noremove"){F.ask=false;render();return}
+ if(a==="doremove"){const r=await api("POST",`/api/a/cars/${encodeURIComponent(F.edit)}/remove`);if(!r.ok){toast(r.err);return}
+  await loadState();S.stack=["home"];S.screen="plan";S.f={};render();return}
+ if(a==="oil"){const r=await api("POST",`/api/a/cars/${encodeURIComponent(F.car.plate)}/oil`);if(!r.ok){toast(r.err);return}
+  Object.assign(F.car,r.j.car);F.oilOk=true;F.car.history.unshift({ts:Date.now()/1000,who_name:S.st.me.name,kind:"oil",car_name:F.car.name,detail:""});loadState();render();return}
+ /* --- demandes --- */
+ if(b.dataset.docs){F.open[b.dataset.docs]=!F.open[b.dataset.docs];render();return}
+ if(b.dataset.res){const id=b.dataset.res,yes=b.dataset.ok==="1";b.disabled=true;
+  const r=await api("POST",`/api/a/requests/res/${id}`,{ok:yes?"1":"0",price_day:String(F.price[id]||"")});
+  if(!r.ok){toast(r.err);render();return}const x=F.r.res.find(q=>String(q.id)===id);
+  F.done[`b${id}`]=yes?{ok:true,txt:`${x.days} × ${F.price[id]} = ${r.j.total} DT`}:{ok:false,txt:L.refused};loadState();render();return}
+ if(b.dataset.ext){const id=b.dataset.ext,yes=b.dataset.ok==="1";b.disabled=true;const r=await api("POST",`/api/a/requests/ext/${id}`,{ok:yes?"1":"0"});
+  if(!r.ok){toast(r.err);render();return}F.done[`e${id}`]=r.j.status==="approved"?{ok:true,txt:L.accepted}:{ok:false,txt:r.j.reason==="reason_booked"?L.bookedAfter:L.refused};loadState();render();return}
+ /* --- équipe --- */
+ if(b.dataset.flt!==undefined){F.flt=b.dataset.flt;openTeam();return}
+ if(a==="addstaff"){S.stack.push(S.screen);S.screen="staffForm";S.f={form:{name:"",username:"",password:"",phone:"",jobs:[],role:"staff"}};render();return}
+ if(b.dataset.staff){const p=F.team.people.find(x=>x.username===b.dataset.staff);S.stack.push(S.screen);S.screen="staffForm";
+  S.f={edit:p.username,form:{name:p.name||"",username:p.username,password:"",phone:p.phone?"+"+p.phone:"",jobs:[...p.jobs],role:p.role}};render();return}
+ if(b.dataset.job){const j=F.form.jobs,k=b.dataset.job;F.form.jobs=j.includes(k)?j.filter(x=>x!==k):[...j,k];render();return}
+ if(b.dataset.role){F.form.role=b.dataset.role;render();return}
+ if(a==="savestaff"){const f=F.form;if(!f.name.trim()){toast(L.needName);return}S.busy=true;render();
+  const r=await api("POST","/api/a/team",{username:f.username,name:f.name,password:f.password,phone:f.phone,jobs:f.jobs.join(","),role:f.role,is_new:F.edit?"0":"1"});
+  S.busy=false;if(!r.ok){toast(r.err);return}back();S.f.team=null;openTeam();return}
+ if(a==="dorstaff"){const r=await api("POST",`/api/a/team/${encodeURIComponent(F.edit)}/remove`);if(!r.ok){toast(r.err);return}back();openTeam();return}
+});
+document.addEventListener("visibilitychange",()=>{if(!document.hidden&&S.screen==="home")refreshHome()});
+setInterval(()=>{if(S.screen==="home"&&!document.hidden)refreshHome()},60000);
+window.ccResume=()=>{if(S.screen==="home")refreshHome()};
+restoreFlow();render();refreshHome();
+
+</script></body></html>
